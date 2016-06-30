@@ -18,7 +18,6 @@
  *                                                                         *
  *   For details about the authors of this software, see the AUTHORS file. *
  ***************************************************************************/
-
 package jolie.net.http;
 
 import java.util.Map;
@@ -33,16 +32,16 @@ public enum Method
 	POST( "POST" ),
 	GET( "GET" );
 
-	private final static Map< String, Method > idMap = new ConcurrentHashMap<>();
+	private final static Map< String, Method> idMap = new ConcurrentHashMap<>();
 
 	static {
-		for( Method type : Method.values() ) {
+		for ( Method type : Method.values() ) {
 			idMap.put( type.id(), type );
 		}
 	}
 
 	private final String id;
-	
+
 	private Method( String id )
 	{
 		this.id = id;
@@ -54,7 +53,7 @@ public enum Method
 	}
 
 	public static Method fromString( String id )
-		throws UnsupportedMethodException
+			throws UnsupportedMethodException
 	{
 		Method m = idMap.get( id.toUpperCase() );
 		if ( m == null ) {
