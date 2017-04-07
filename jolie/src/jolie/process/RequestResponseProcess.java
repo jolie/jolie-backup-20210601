@@ -107,7 +107,11 @@ public class RequestResponseProcess implements InputOperationProcess
 
 		log( "RECEIVED", sessionMessage.message() );
 		if ( inputVarPath != null ) {
-			inputVarPath.getValue( state.root() ).refCopy( sessionMessage.message().value() );
+            try {
+                inputVarPath.getValue( state.root() ).refCopy( sessionMessage.message().value() );
+            } catch ( FaultException e ){
+                e.printStackTrace();
+            }
 		}
 
 		return new Process() {
@@ -174,7 +178,7 @@ public class RequestResponseProcess implements InputOperationProcess
 		return CommMessage.createFaultResponse( request, f );
 	}
 	
-	private void runBehaviour( CommChannel channel, CommMessage message )
+	private void runBehaviour( CommChannel channel, CommMessage message ) 
 		throws FaultException
 	{
 		// Variables for monitor
@@ -259,7 +263,7 @@ public class RequestResponseProcess implements InputOperationProcess
 
 		if ( fault != null ) {
 			if ( typeMismatch != null ) {
-				Interpreter.getInstance().logWarning( typeMismatch.value().strValue() );
+				Interpreter.getInstance().logWarning( typeMismatch.value().safeStrValue() );
 			}
 			throw fault;
 		} else if ( typeMismatch != null ) {

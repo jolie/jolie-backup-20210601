@@ -248,7 +248,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 			ValueVector vec = getParameterVector( "schema" );
 			if ( vec.size() > 0 ) {
 				for( Value v : vec ) {
-					schemaParser.parse( new File( v.strValue() ) );
+					schemaParser.parse( new File( v.safeStrValue() ) );
 				}
 			}
 			parseWSDLTypes( schemaParser );
@@ -302,7 +302,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 				type = "boolean";
 			}
 			element.addAttribute( soapEnvelope.createName( "type", "xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI ), "xsd:" + type );
-			element.addTextNode( value.strValue() );
+			element.addTextNode( value.safeStrValue() );
 		} else if ( !value.hasChildren() ) {
 			element.addAttribute( soapEnvelope.createName( "nil", "xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI ), "true" );
 		}
@@ -313,7 +313,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 				for( Entry<String, ValueVector> attrEntry : attrs.entrySet() ) {
 					element.addAttribute(
 						soapEnvelope.createName( attrEntry.getKey() ),
-						attrEntry.getValue().first().strValue() );
+						attrEntry.getValue().first().safeStrValue() );
 				}
 			}
 		}
@@ -464,7 +464,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 		XSType currType = xsDecl.getType();
 
 		if ( currType.isSimpleType() ) {
-			element.addTextNode( value.strValue() );
+			element.addTextNode( value.safeStrValue() );
 
 		} else if ( currType.isComplexType() ) {
 			XSType type = currType;
@@ -472,7 +472,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 				// if the complex type is abstract search for the inherited type defined into the jolie value
 				// under the node __soap_inherited_type
 				if ( value.hasChildren( Parameters.INHERITED_TYPE ) ) {
-					String inheritedType = value.getFirstChild( Parameters.INHERITED_TYPE ).strValue();
+					String inheritedType = value.getFirstChild( Parameters.INHERITED_TYPE ).safeStrValue();
 					XSComplexType xsInheritedType = sSet.getComplexType( messageNamespace, inheritedType );
 					if ( xsInheritedType == null ) {
 						System.out.println( "WARNING: Type " + inheritedType + " not found in the schema set" );
@@ -500,10 +500,10 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 				if ( (currValue = getAttributeOrNull( value, name )) != null ) {
 					String prefix = getPrefixOrNull( attrUse.getDecl() );
 					if ( prefix == null ) {
-						element.addAttribute( envelope.createName( name ), currValue.strValue() );
+						element.addAttribute( envelope.createName( name ), currValue.safeStrValue() );
 					} else {
 						QName attrName = envelope.createQName( name, getPrefixOrNull( attrUse.getDecl() ) );
-						element.addAttribute( attrName, currValue.strValue() );
+						element.addAttribute( attrName, currValue.safeStrValue() );
 					}
 				}
 			}
@@ -511,7 +511,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 			// processing content (no base type parent )
 			contentT = complexT.getContentType();
 			if ( contentT.asSimpleType() != null ) {
-				element.addTextNode( value.strValue() );
+				element.addTextNode( value.safeStrValue() );
 			} else if ( (particle = contentT.asParticle()) != null ) {
 				XSTerm term = particle.getTerm();
 				XSModelGroupDecl modelGroupDecl;
@@ -570,7 +570,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 	{
 		Port port = wsdlPort;
 		if ( port == null && hasParameter( "wsdl" ) && getParameterFirstValue( "wsdl" ).hasChildren( "port" ) ) {
-			String portName = getParameterFirstValue( "wsdl" ).getFirstChild( "port" ).strValue();
+			String portName = getParameterFirstValue( "wsdl" ).getFirstChild( "port" ).safeStrValue();
 			Definition definition = getWSDLDefinition();
 			if ( definition != null ) {
 				Map<QName, Service> services = definition.getServices();
@@ -775,14 +775,14 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 							// attributes must be added to the envelope
 							ValueVector attributes = add_parameter.getFirstChild( Parameters.ENVELOPE ).getChildren( "attribute" );
 							for( Value att : attributes ) {
-								soapEnvelope.addNamespaceDeclaration( att.getFirstChild( "name" ).strValue(), att.getFirstChild( "value" ).strValue() );
+								soapEnvelope.addNamespaceDeclaration( att.getFirstChild( "name" ).safeStrValue(), att.getFirstChild( "value" ).safeStrValue() );
 							}
 						}
 					}
 					boolean wrapped = true;
 					Value vStyle = getParameterVector( Parameters.STYLE ).first();
-					if ( "document".equals( vStyle.strValue() ) ) {
-						wrapped = vStyle.getFirstChild( Parameters.WRAPPED ).boolValue();
+					if ( "document".equals( vStyle.safeStrValue() ) ) {
+						wrapped = vStyle.getFirstChild( Parameters.WRAPPED ).safeBoolValue();
 					}
 					SOAPElement opBody = soapBody;
 					if ( wrapped ) {
@@ -794,16 +794,16 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 							if ( add_parameter.hasChildren( Parameters.OPERATION ) ) {
 								ValueVector operations = add_parameter.getChildren( Parameters.OPERATION );
 								for( Value op : operations ) {
-									if ( op.getFirstChild( "operation_name" ).strValue().equals( message.operationName() ) ) {
+									if ( op.getFirstChild( "operation_name" ).safeStrValue().equals( message.operationName() ) ) {
 										// attributes must be added to the envelope
 										Value attribute = op.getFirstChild( "attribute" );
 										QName attrName;
 										if ( attribute.hasChildren( "prefix" ) ) {
-											attrName = opBody.createQName( attribute.getFirstChild( "name" ).strValue(), attribute.getFirstChild( "prefix" ).strValue() );
+											attrName = opBody.createQName( attribute.getFirstChild( "name" ).safeStrValue(), attribute.getFirstChild( "prefix" ).safeStrValue() );
 										} else {
-											attrName = opBody.createQName( attribute.getFirstChild( "name" ).strValue(), null );
+											attrName = opBody.createQName( attribute.getFirstChild( "name" ).safeStrValue(), null );
 										}
-										opBody.addAttribute( attrName, attribute.getFirstChild( "value" ).strValue() );
+										opBody.addAttribute( attrName, attribute.getFirstChild( "value" ).safeStrValue() );
 									}
 								}
 							}
@@ -859,7 +859,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 				}
 			}
 
-			if ( getParameterVector( "keepAlive" ).first().intValue() != 1 ) {
+			if ( getParameterVector( "keepAlive" ).first().safeIntValue() != 1 ) {
 				channel().setToBeClosed( true );
 				httpMessage.append( "Connection: close" + HttpUtils.CRLF );
 			}
@@ -876,7 +876,7 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 			}
 			httpMessage.append( HttpUtils.CRLF );
 
-			if ( getParameterVector( "debug" ).first().intValue() > 0 ) {
+			if ( getParameterVector( "debug" ).first().safeIntValue() > 0 ) {
 				interpreter.logInfo( "[SOAP debug] Sending:\n" + httpMessage.toString() + content.toString( "utf-8" ) );
 			}
 
@@ -955,13 +955,13 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 		}
 
 		if ( "xsd:int".equals( type ) ) {
-			value.setValue( value.intValue() );
+			value.setValue( value.safeIntValue() );
 		} else if ( "xsd:long".equals( type ) ) {
-			value.setValue( value.longValue() );
+			value.setValue( value.safeLongValue() );
 		} else if ( "xsd:double".equals( type ) ) {
-			value.setValue( value.doubleValue() );
+			value.setValue( value.safeDoubleValue() );
 		} else if ( "xsd:boolean".equals( type ) ) {
-			value.setValue( value.boolValue() );
+			value.setValue( value.safeBoolValue() );
 		}
 	}
 
@@ -1059,8 +1059,8 @@ public class SoapProtocol extends SequentialCommProtocol implements HttpUtils.Ht
 						Value schemaPath;
 						for( int i = 0; i < schemaPaths.size(); i++ ) {
 							schemaPath = schemaPaths.get( i );
-							if ( schemaPath.getChildren( "validate" ).first().intValue() > 0 ) {
-								sources.add( new StreamSource( new File( schemaPaths.get( i ).strValue() ) ) );
+							if ( schemaPath.getChildren( "validate" ).first().safeIntValue() > 0 ) {
+								sources.add( new StreamSource( new File( schemaPaths.get( i ).safeStrValue() ) ) );
 							}
 						}
 

@@ -70,7 +70,7 @@ public class QueueUtils extends JavaService
 	 * @return Boolean - false if the queue does not exist
 	 */
 	public Boolean push( Value request ){
-		String queue_key = request.getFirstChild( "queue_name" ).strValue();
+		String queue_key = request.getFirstChild( "queue_name" ).safeStrValue();
 		if( has_queue( queue_key ) ){
 			Value element = request.getFirstChild( "element" );
 			LinkedList queue = queue_map.get( queue_key );

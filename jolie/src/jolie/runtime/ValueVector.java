@@ -58,7 +58,13 @@ class ValueVectorLink extends ValueVector implements Cloneable
 	
 	private ValueVector getLinkedValueVector()
 	{
-		return linkPath.getValueVector();
+		ValueVector linkPath = null;
+        try {
+            linkPath = this.linkPath.getValueVector();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+        return linkPath;
 	}
 	
 	protected List< Value > values()
@@ -74,7 +80,12 @@ class ValueVectorLink extends ValueVector implements Cloneable
 	@Override
 	public int size()
 	{
-		ValueVector vector = linkPath.getValueVectorOrNull();
+		ValueVector vector = null;
+        try {
+            linkPath.getValueVectorOrNull();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
 		return ( vector == null ) ? 0 : vector.size();
 	}
 }

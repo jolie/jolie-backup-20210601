@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2016 Fabrizio Montesi <famontesi@gmail.com>
+ * Copyright (C) 2017 thesave.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,33 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-
-
 package jolie.runtime.expression;
 
-import jolie.process.TransformationReason;
-import jolie.runtime.FaultException;
-import jolie.runtime.Value;
-import jolie.runtime.ValueVector;
-import jolie.runtime.VariablePath;
-
-public class ValueVectorSizeExpression implements Expression
-{
-	private final VariablePath path;
-	
-	public ValueVectorSizeExpression( VariablePath path )
-	{
-		this.path = path;
-	}
-	
-	public Expression cloneExpression( TransformationReason reason )
-	{
-		return new ValueVectorSizeExpression( path );
-	}
-	
-	public Value evaluate() throws FaultException
-	{
-		ValueVector vector = path.getValueVectorOrNull();
-		return Value.create( ( vector == null ) ? 0 : vector.size() );
-	}
+/**
+ *
+ * @author thesave
+ */
+class faultException extends Exception {
+    
 }

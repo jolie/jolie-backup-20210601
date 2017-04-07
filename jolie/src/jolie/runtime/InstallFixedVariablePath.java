@@ -45,9 +45,15 @@ public class InstallFixedVariablePath implements Expression
 	public Expression cloneExpression( TransformationReason reason )
 	{
 		if ( reason instanceof HandlerInstallationReason ) {
-			return new InstallFixedVariablePath( Value.createDeepCopy( path.getValue() ) );
+            Value path = null;
+            try {
+                path = this.path.getValue();
+            } catch ( FaultException e ){
+                e.printStackTrace();
+            }
+            return new InstallFixedVariablePath( Value.createDeepCopy( path ) );
 		}
-		
+        
 		return new InstallFixedVariablePath( path );
 	}
 	

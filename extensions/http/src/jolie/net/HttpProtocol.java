@@ -265,7 +265,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 				v = v.getFirstChild( partName );
 				if ( v.hasChildren( Parameters.MultiPartHeaders.FILENAME ) ) {
 					v = v.getFirstChild( Parameters.MultiPartHeaders.FILENAME );
-					return v.strValue();
+					return v.safeStrValue();
 				}
 			}
 		}
@@ -288,13 +288,13 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			StringBuilder cookieSB = new StringBuilder();
 			for( Entry< String, ValueVector > entry : cookieParam.children().entrySet() ) {
 				cookieConfig = entry.getValue().first();
-				if ( message.value().hasChildren( cookieConfig.strValue() ) ) {
-					domain = cookieConfig.hasChildren( "domain" ) ? cookieConfig.getFirstChild( "domain" ).strValue() : "";
+				if ( message.value().hasChildren( cookieConfig.safeStrValue() ) ) {
+					domain = cookieConfig.hasChildren( "domain" ) ? cookieConfig.getFirstChild( "domain" ).safeStrValue() : "";
 					if ( domain.isEmpty() || hostname.endsWith( domain ) ) {
 						cookieSB
 							.append( entry.getKey() )
 							.append( '=' )
-							.append( message.value().getFirstChild( cookieConfig.strValue() ).strValue() )
+							.append( message.value().getFirstChild( cookieConfig.safeStrValue() ).safeStrValue() )
 							.append( ";" );
 					}
 				}
@@ -320,18 +320,18 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			Value cookieConfig;
 			for( Entry< String, ValueVector > entry : cookieParam.children().entrySet() ) {
 				cookieConfig = entry.getValue().first();
-				if ( message.value().hasChildren( cookieConfig.strValue() ) ) {
+				if ( message.value().hasChildren( cookieConfig.safeStrValue() ) ) {
 					headerBuilder
 						.append( "Set-Cookie: " )
 						.append( entry.getKey() ).append( '=' )
-						.append( message.value().getFirstChild( cookieConfig.strValue() ).strValue() )
+						.append( message.value().getFirstChild( cookieConfig.safeStrValue() ).safeStrValue() )
 						.append( "; expires=" )
-						.append( cookieConfig.hasChildren( "expires" ) ? cookieConfig.getFirstChild( "expires" ).strValue() : "" )
+						.append( cookieConfig.hasChildren( "expires" ) ? cookieConfig.getFirstChild( "expires" ).safeStrValue() : "" )
 						.append( "; domain=" )
-						.append( cookieConfig.hasChildren( "domain" ) ? cookieConfig.getFirstChild( "domain" ).strValue() : "" )
+						.append( cookieConfig.hasChildren( "domain" ) ? cookieConfig.getFirstChild( "domain" ).safeStrValue() : "" )
 						.append( "; path=" )
-						.append( cookieConfig.hasChildren( "path" ) ? cookieConfig.getFirstChild( "path" ).strValue() : "" );
-					if ( cookieConfig.hasChildren( "secure" ) && cookieConfig.getFirstChild( "secure" ).intValue() > 0 ) {
+						.append( cookieConfig.hasChildren( "path" ) ? cookieConfig.getFirstChild( "path" ).safeStrValue() : "" );
+					if ( cookieConfig.hasChildren( "secure" ) && cookieConfig.getFirstChild( "secure" ).safeIntValue() > 0 ) {
 						headerBuilder.append( "; secure" );
 					}
 					headerBuilder.append( HttpUtils.CRLF );
@@ -354,7 +354,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 					headerBuilder
 						.append( URLEncoder.encode( entry.getKey(), HttpUtils.URL_DECODER_ENC ) )
 						.append( '=' )
-						.append( URLEncoder.encode( v.strValue(), HttpUtils.URL_DECODER_ENC ) )
+						.append( URLEncoder.encode( v.safeStrValue(), HttpUtils.URL_DECODER_ENC ) )
 						.append( '&' );
 				}
 			}
@@ -387,18 +387,18 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			if ( m.group( 1 ) == null ) { // ! is missing after %: We have to use URLEncoder
 				currKey = alias.substring( m.start() + displacement, m.end() - 1 );
 				if ( "$".equals( currKey ) ) {
-					currStrValue = URLEncoder.encode( value.strValue(), HttpUtils.URL_DECODER_ENC );
+					currStrValue = URLEncoder.encode( value.safeStrValue(), HttpUtils.URL_DECODER_ENC );
 				} else {
-					currStrValue = URLEncoder.encode( value.getFirstChild( currKey ).strValue(), HttpUtils.URL_DECODER_ENC );
+					currStrValue = URLEncoder.encode( value.getFirstChild( currKey ).safeStrValue(), HttpUtils.URL_DECODER_ENC );
 					aliasKeys.add( currKey );
 				}
 			} else { // ! is given after %: We have to insert the string raw
                                displacement = 3;
 				currKey = alias.substring( m.start() + displacement, m.end() - 1 );
 				if ( "$".equals( currKey ) ) {
-					currStrValue = value.strValue();
+					currStrValue = value.safeStrValue();
 				} else {
-					currStrValue = value.getFirstChild( currKey ).strValue();
+					currStrValue = value.getFirstChild( currKey ).safeStrValue();
 					aliasKeys.add( currKey );
 				}
 			}
@@ -476,11 +476,11 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 				builder.append( "<html><head><title>" );
 				builder.append( message.fault().faultName() );
 				builder.append( "</title></head><body>" );
-				builder.append( message.fault().value().strValue() );
+				builder.append( message.fault().value().safeStrValue() );
 				builder.append( "</body></html>" );
 				ret.content = new ByteArray( builder.toString().getBytes( charset ) );
 			} else {
-				ret.content = new ByteArray( message.value().strValue().getBytes( charset ) );
+				ret.content = new ByteArray( message.value().safeStrValue().getBytes( charset ) );
 			}
 		} else if ( "multipart/form-data".equals( format ) ) {
 			ret.contentType = "multipart/form-data; boundary=" + BOUNDARY;
@@ -497,13 +497,13 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 							ValueVector partNames = specOpParam.getChildren( "partName" );
 							for( int p = 0; p < partNames.size(); p++ ) {
 								if ( partNames.get( p ).hasChildren( "part" ) ) {
-									if ( partNames.get( p ).getFirstChild( "part" ).strValue().equals( entry.getKey() ) ) {
+									if ( partNames.get( p ).getFirstChild( "part" ).safeStrValue().equals( entry.getKey() ) ) {
 										isBinary = true;
 										if ( partNames.get( p ).hasChildren( "filename" ) ) {
-											builder.append( "; filename=\"" ).append( partNames.get( p ).getFirstChild( "filename" ).strValue() ).append( "\"" );
+											builder.append( "; filename=\"" ).append( partNames.get( p ).getFirstChild( "filename" ).safeStrValue() ).append( "\"" );
 										}
 										if ( partNames.get( p ).hasChildren( "contentType" ) ) {
-											builder.append( HttpUtils.CRLF ).append( "Content-Type:" ).append( partNames.get( p ).getFirstChild( "contentType" ).strValue() );
+											builder.append( HttpUtils.CRLF ).append( "Content-Type:" ).append( partNames.get( p ).getFirstChild( "contentType" ).safeStrValue() );
 										}
 									}
 								}
@@ -518,7 +518,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 						builder.delete( 0, builder.length() - 1 );
 						builder.append( HttpUtils.CRLF );
 					} else {
-						builder.append( entry.getValue().first().strValue() ).append( HttpUtils.CRLF );
+						builder.append( entry.getValue().first().safeStrValue() ).append( HttpUtils.CRLF );
 					}
 				}
 			}
@@ -534,14 +534,14 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 				builder.append( "faultName=" );
 				builder.append( URLEncoder.encode( message.fault().faultName(), HttpUtils.URL_DECODER_ENC ) );
 				builder.append( "&data=" );
-				builder.append( URLEncoder.encode( message.fault().value().strValue(), HttpUtils.URL_DECODER_ENC ) );
+				builder.append( URLEncoder.encode( message.fault().value().safeStrValue(), HttpUtils.URL_DECODER_ENC ) );
 			} else {
 				Entry< String, ValueVector > entry;
 				while( it.hasNext() ) {
 					entry = it.next();
 					builder.append( URLEncoder.encode( entry.getKey(), HttpUtils.URL_DECODER_ENC ) )
 						.append( "=" )
-						.append( URLEncoder.encode( entry.getValue().first().strValue(), HttpUtils.URL_DECODER_ENC ) );
+						.append( URLEncoder.encode( entry.getValue().first().safeStrValue(), HttpUtils.URL_DECODER_ENC ) );
 					if ( it.hasNext() ) {
 						builder.append( '&' );
 					}
@@ -585,9 +585,9 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 		} else if ( "raw".equals( format ) ) {
 			ret.contentType = "text/plain";
 			if ( message.isFault() ) {
-				ret.content = new ByteArray( message.fault().value().strValue().getBytes( charset ) );
+				ret.content = new ByteArray( message.fault().value().safeStrValue().getBytes( charset ) );
 			} else {
-				ret.content = new ByteArray( message.value().strValue().getBytes( charset ) );
+				ret.content = new ByteArray( message.value().safeStrValue().getBytes( charset ) );
 			}
 		}
 		return ret;
@@ -605,7 +605,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			responseHeaderParameters = getOperationSpecificParameterFirstValue(message.operationName(), Parameters.RESPONSE_USER);
 			if ( ( responseHeaderParameters != null ) && ( responseHeaderParameters.hasChildren(Parameters.HEADER_USER) ) ) {
 				for ( Entry< String, ValueVector > entry : responseHeaderParameters.getFirstChild(Parameters.HEADER_USER).children().entrySet() )
-					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().strValue() ).append( HttpUtils.CRLF );
+					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().safeStrValue() ).append( HttpUtils.CRLF );
 			}
 		}
 
@@ -615,7 +615,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 
 			if ( ( responseHeaderParameters != null ) && ( responseHeaderParameters.hasChildren(Parameters.HEADER_USER) ) ) {
 				for ( Entry< String, ValueVector > entry : responseHeaderParameters.getFirstChild(Parameters.HEADER_USER).children().entrySet() )
-					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().strValue() ).append( HttpUtils.CRLF );
+					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().safeStrValue() ).append( HttpUtils.CRLF );
 			}
 		}
 	}
@@ -664,7 +664,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 		if ( hasParameter( Parameters.CACHE_CONTROL ) ) {
 			Value cacheControl = getParameterFirstValue( Parameters.CACHE_CONTROL );
 			if ( cacheControl.hasChildren( "maxAge" ) ) {
-				cacheControlHeader.append( "max-age=" ).append( cacheControl.getFirstChild( "maxAge" ).intValue() );
+				cacheControlHeader.append( "max-age=" ).append( cacheControl.getFirstChild( "maxAge" ).safeIntValue() );
 			}
 		}
 		if ( cacheControlHeader.length() > 0 ) {
@@ -712,8 +712,8 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			Value v = message.value().getFirstChild( jolie.lang.Constants.Predefined.HTTP_BASIC_AUTHENTICATION.token().content() );
 			//String realm = v.getFirstChild( "realm" ).strValue();
 			String userpass =
-				v.getFirstChild( "userid" ).strValue() + ":" +
-				v.getFirstChild( "password" ).strValue();
+				v.getFirstChild( "userid" ).safeStrValue() + ":" +
+				v.getFirstChild( "password" ).safeStrValue();
 			Base64.Encoder encoder = Base64.getEncoder();
 			userpass = encoder.encodeToString( userpass.getBytes() );
 			headerBuilder.append( "Authorization: Basic " ).append( userpass ).append( HttpUtils.CRLF );
@@ -727,7 +727,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			responseHeaderParameters = getOperationSpecificParameterFirstValue(message.operationName(), Parameters.RESPONSE_USER);
 			if ( ( responseHeaderParameters != null ) && ( responseHeaderParameters.hasChildren(Parameters.HEADER_USER) ) ) {
 				for ( Entry< String, ValueVector > entry : responseHeaderParameters.getFirstChild(Parameters.HEADER_USER).children().entrySet() )
-					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().strValue() ).append( HttpUtils.CRLF );
+					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().safeStrValue() ).append( HttpUtils.CRLF );
 			}
 		}
 
@@ -736,7 +736,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			responseHeaderParameters  = getParameterFirstValue(Parameters.REQUEST_USER);
 			if ( ( responseHeaderParameters != null ) && ( responseHeaderParameters.hasChildren(Parameters.HEADER_USER) ) ) {
 				for ( Entry< String, ValueVector > entry : responseHeaderParameters.getFirstChild(Parameters.HEADER_USER).children().entrySet() )
-					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().strValue() ).append( HttpUtils.CRLF );
+					headerBuilder.append( entry.getKey() ).append(": ").append( entry.getValue().first().safeStrValue() ).append( HttpUtils.CRLF );
 			}
 		}
 	}
@@ -748,8 +748,8 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			if ( v.hasChildren( "header" ) ) {
 				for( Value head : v.getChildren( "header" ) ) {
 					String header
-						= head.strValue() + ": "
-						+ head.getFirstChild( "value" ).strValue();
+						= head.safeStrValue() + ": "
+						+ head.getFirstChild( "value" ).safeStrValue();
 					headerBuilder.append( header ).append( HttpUtils.CRLF );
 				}
 			}
@@ -857,7 +857,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			debugSB.append( "[HTTP debug] Sending:\n" );
 			debugSB.append( header );
 			if (
-				getParameterVector( Parameters.DEBUG ).first().getFirstChild( "showContent" ).intValue() > 0
+				getParameterVector( Parameters.DEBUG ).first().getFirstChild( "showContent" ).safeIntValue() > 0
 				&& encodedContent.content != null
 				) {
 				debugSB.append( encodedContent.content.toString( charset ) );
@@ -883,7 +883,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			// We're sending a notification or a solicit
 			String qsFormat = "";
 			if ( method == Method.GET && getParameterFirstValue( Parameters.METHOD ).hasChildren( "queryFormat" ) ) {
-				if ( getParameterFirstValue( Parameters.METHOD ).getFirstChild( "queryFormat" ).strValue().equals( "json" ) ) {
+				if ( getParameterFirstValue( Parameters.METHOD ).getFirstChild( "queryFormat" ).safeStrValue().equals( "json" ) ) {
 					qsFormat = format = "json";
 					contentType = ContentTypes.APPLICATION_JSON;
 				}
@@ -981,10 +981,10 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 				if ( cookies.hasChildren( cookie.name() ) ) {
 					cookieConfig = cookies.getFirstChild( cookie.name() );
 					if ( cookieConfig.isString() ) {
-						v = value.getFirstChild( cookieConfig.strValue() );
+						v = value.getFirstChild( cookieConfig.safeStrValue() );
 						type =
 							cookieConfig.hasChildren( "type" ) ?
-								cookieConfig.getFirstChild( "type" ).strValue()
+								cookieConfig.getFirstChild( "type" ).safeStrValue()
 							:
 								"string";
 						recv_assignCookieValue( cookie.value(), v, type );
@@ -1050,9 +1050,9 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 				if ( cookies.hasChildren( entry.getKey() ) ) {
 					Value cookieConfig = cookies.getFirstChild( entry.getKey() );
 					if ( cookieConfig.isString() ) {
-						v = decodedMessage.value.getFirstChild( cookieConfig.strValue() );
+						v = decodedMessage.value.getFirstChild( cookieConfig.safeStrValue() );
 						if ( cookieConfig.hasChildren( "type" ) ) {
-							type = cookieConfig.getFirstChild( "type" ).strValue();
+							type = cookieConfig.getFirstChild( "type" ).safeStrValue();
 						} else {
 							type = "string";
 						}
@@ -1074,7 +1074,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 		}
 		if ( headers != null ) {
 			for( String headerName : headers.children().keySet() ) {
-				String headerAlias = headers.getFirstChild( headerName ).strValue();
+				String headerAlias = headers.getFirstChild( headerName ).safeStrValue();
 				headerName = headerName.replace( "_", "-" );
 				decodedMessage.value.getFirstChild( headerAlias ).setValue( message.getPropertyOrEmptyString( headerName ) );
 			}
@@ -1143,7 +1143,7 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			debugSB.append( "\tcookie: " + entry.getKey() + '=' + entry.getValue() + '\n' );
 		}
 		if (
-			getParameterFirstValue( Parameters.DEBUG ).getFirstChild( "showContent" ).intValue() > 0
+			getParameterFirstValue( Parameters.DEBUG ).getFirstChild( "showContent" ).safeIntValue() > 0
 			&& message.size() > 0
 		) {
 			debugSB.append( "--> Message content\n" );
@@ -1198,9 +1198,9 @@ public class HttpProtocol extends CommProtocol implements HttpUtils.HttpProtocol
 			Value dParam = getParameterFirstValue( Parameters.DEFAULT_OPERATION );
 			String method = HttpUtils.httpMessageTypeToString( t );
 			if ( method == null || dParam.hasChildren( method ) == false ) {
-				return dParam.strValue();
+				return dParam.safeStrValue();
 			} else {
-				return dParam.getFirstChild( method ).strValue();
+				return dParam.getFirstChild( method ).safeStrValue();
 			}
 		}
 

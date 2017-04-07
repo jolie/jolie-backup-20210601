@@ -35,41 +35,41 @@ public final class CompareOperators
 	public final static BiPredicate< Value, Value > MINOR =
 		( left, right ) -> {
 			if ( left.isDouble() ) {
-				return ( left.doubleValue() < right.doubleValue() );
+				return ( left.safeDoubleValue() < right.safeDoubleValue() );
 			} if ( left.isLong() ) {
-				return ( left.longValue() < right.longValue() );
+				return ( left.safeLongValue() < right.safeLongValue() );
 			} else {
-				return ( left.intValue() < right.intValue() );
+				return ( left.safeIntValue() < right.safeIntValue() );
 			}
 		};
 	public final static BiPredicate< Value, Value > MAJOR =
 		( left, right ) -> {
 			if ( left.isDouble() ) {
-				return ( left.doubleValue() > right.doubleValue() );
+				return ( left.safeDoubleValue() > right.safeDoubleValue() );
 			} if ( left.isLong() ) {
-				return ( left.longValue() > right.longValue() );
+				return ( left.safeLongValue() > right.safeLongValue() );
 			} else {
-				return ( left.intValue() > right.intValue() );
+				return ( left.safeIntValue() > right.safeIntValue() );
 			}
 		};
 	public final static BiPredicate< Value, Value > MINOR_OR_EQUAL =
 		( left, right ) -> {
 			if ( left.isDouble() ) {
-				return ( left.doubleValue() <= right.doubleValue() );
+				return ( left.safeDoubleValue() <= right.safeDoubleValue() );
 			} if ( left.isLong() ) {
-				return ( left.longValue() <= right.longValue() );
+				return ( left.safeLongValue() <= right.safeLongValue() );
 			} else {
-				return ( left.intValue() <= right.intValue() );
+				return ( left.safeIntValue() <= right.safeIntValue() );
 			}
 		};
 	public final static BiPredicate< Value, Value > MAJOR_OR_EQUAL =
 		( left, right ) -> {
 			if ( left.isDouble() ) {
-				return ( left.doubleValue() >= right.doubleValue() );
+				return ( left.safeDoubleValue() >= right.safeDoubleValue() );
 			} if ( left.isLong() ) {
-				return ( left.longValue() >= right.longValue() );
+				return ( left.safeLongValue() >= right.safeLongValue() );
 			} else {
-				return ( left.intValue() >= right.intValue() );
+				return ( left.safeIntValue() >= right.safeIntValue() );
 			}
 		};
 }

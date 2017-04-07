@@ -26,6 +26,7 @@ import jolie.SessionListener;
 import jolie.SessionThread;
 import jolie.net.CommChannel;
 import jolie.net.CommMessage;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.correlation.CorrelationSet.CorrelationPair;
 import jolie.runtime.correlation.impl.SimpleCorrelationEngine;
@@ -89,13 +90,18 @@ public abstract class CorrelationEngine implements SessionListener
 		if ( correlationSet == null ) { // TODO check this w.r.t. the type system
 			return;
 		}
-		for( CorrelationPair pair : starter.correlationInitializer().getOperationCorrelationPairs( starter.guard().inputOperation().id() ) ) {
-			messageValue = pair.messagePath().getValueOrNull( message.value() );
-			if ( messageValue == null ) {
-				messageValue = Value.create();
-			}
-			pair.sessionPath().getValue( session.state().root() ).assignValue( messageValue );
-		}
+        try {
+            for( CorrelationPair pair : starter.correlationInitializer().getOperationCorrelationPairs( starter.guard().inputOperation().id() ) ) {
+                messageValue = pair.messagePath().getValueOrNull( message.value() );
+                if ( messageValue == null ) {
+                    messageValue = Value.create();
+                }
+                pair.sessionPath().getValue( session.state().root() ).assignValue( messageValue );
+            }
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+		
 	}
 
 	public void onMessageReceive( final CommMessage message, final CommChannel channel )

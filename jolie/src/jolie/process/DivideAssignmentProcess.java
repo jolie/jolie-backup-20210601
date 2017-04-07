@@ -22,9 +22,12 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
+import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
+import jolie.runtime.typing.TypeCastingException;
 
 /**
  * Divide a VariablePath's value with an expression value, assigning the resulting
@@ -64,18 +67,42 @@ public class DivideAssignmentProcess implements Process, Expression
 	}
 
 	/** Evaluates the expression and adds its value to the variable's value. */
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() ) {
 			return;
 		}
-		varPath.getValue().divide( expression.evaluate() );
+        try {
+            varPath.getValue().divide( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            new FaultException(
+              Constants.CASTING_EXCEPTION_FAULT_NAME,
+              "Could not divide non-numberic values"
+            );
+        } catch ( ArithmeticException e ){
+            new FaultException(
+              Constants.ARITHMETIC_EXCEPTION_FAULT_NAME,
+              "Division by zero"
+            );
+        }
 	}
 
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = varPath.getValue();
-		val.divide( expression.evaluate() );
+		try {
+            val.divide( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            new FaultException(
+              Constants.CASTING_EXCEPTION_FAULT_NAME,
+              "Could not divide non-numberic values"
+            );
+        } catch ( ArithmeticException e ){
+            new FaultException(
+              Constants.ARITHMETIC_EXCEPTION_FAULT_NAME,
+              "Division by zero"
+            );
+        }
 		return val;
 	}
 

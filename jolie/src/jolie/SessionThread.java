@@ -212,7 +212,7 @@ public class SessionThread extends ExecutionThread
 				@Override
 				public void run() throws FaultException, ExitingException
 				{
-					interpreter.logInfo( typeMismatchPath.getValue().strValue() );
+					interpreter.logInfo( typeMismatchPath.getValue().safeStrValue() );
 				}
 
 				@Override
@@ -234,7 +234,7 @@ public class SessionThread extends ExecutionThread
 				@Override
 				public void run() throws FaultException, ExitingException
 				{
-					interpreter.logInfo( ioExceptionPath.getValue().strValue() );
+					interpreter.logInfo( ioExceptionPath.getValue().safeStrValue() );
 				}
 
 				@Override

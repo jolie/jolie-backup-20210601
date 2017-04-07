@@ -75,7 +75,12 @@ public class OneWayProcess implements InputOperationProcess
 
 		log( "RECEIVED", sessionMessage.message() );
 		if ( varPath != null ) {
-			varPath.getValue( state.root() ).refCopy( sessionMessage.message().value() );
+            try {
+                varPath.getValue( state.root() ).refCopy( sessionMessage.message().value() );
+            } catch ( FaultException e ){
+                e.printStackTrace();
+            }
+			
 		}
 
 		return NullProcess.getInstance();

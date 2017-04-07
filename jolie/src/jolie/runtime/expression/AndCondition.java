@@ -25,6 +25,7 @@ package jolie.runtime.expression;
 
 import java.util.concurrent.locks.Condition;
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 
 /** Provides the support for a "logical and" chain of other conditions. 
@@ -53,10 +54,10 @@ public class AndCondition implements Expression
 	 * evaluation returning false, without checking the other conditions.  
 	 * @return true if every condition is satisfied, false otherwise.
 	 */
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		for( Expression condition : children ) {
-			if ( condition.evaluate().boolValue() == false ) {
+			if ( condition.evaluate().safeBoolValue() == false ) {
 				return Value.create( false );
 			}
 		}

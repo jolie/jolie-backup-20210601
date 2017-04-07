@@ -23,7 +23,9 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public class CastIntExpression implements Expression
 {
@@ -39,8 +41,16 @@ public class CastIntExpression implements Expression
 		return new CastIntExpression( expression.cloneExpression( reason ) );
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
-		return Value.create( expression.evaluate().intValue() );
+		Value v;
+        try {
+            v = Value.create( expression.evaluate().intValue() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException( 
+              TYPE_CASTING_EXCEPTION, 
+              "Could to cast expression to an integer value");
+        }
+        return v;
 	}
 }

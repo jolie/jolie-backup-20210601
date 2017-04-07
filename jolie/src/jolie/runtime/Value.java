@@ -42,7 +42,13 @@ class ValueLink extends Value implements Cloneable
 	private final VariablePath linkPath;
 	private Value getLinkedValue()
 	{
-		return linkPath.getValue();
+        Value linkPath = null;
+        try {
+            linkPath = this.linkPath.getValue();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+        return linkPath;
 	}
 
 	public ValueVector getChildren( String childId )
@@ -495,7 +501,7 @@ public abstract class Value implements Expression, Cloneable
 	{
 		return getChildren( childId ).get( 0 );
 	}
-	
+    
 	public final void setFirstChild( String childId, Object object )
 	{
 		getFirstChild( childId ).setValue( object );
@@ -540,15 +546,15 @@ public abstract class Value implements Expression, Cloneable
 			if ( isByteArray() ) {
 				r = byteArrayValue().equals( val.byteArrayValue() );
 			} else if ( isString() ) {
-				r = strValue().equals( val.strValue() );
+				r = safeStrValue().equals( val.safeStrValue() );
 			} else if ( isInt() ) {
-				r = intValue() == val.intValue();
+				r = safeIntValue() == val.safeIntValue();
 			} else if ( isDouble() ) {
-				r = doubleValue() == val.doubleValue();
+				r = safeDoubleValue() == val.safeDoubleValue();
 			} else if ( isBool() ) {
-				r = boolValue() == val.boolValue();
+				r = safeBoolValue() == val.safeBoolValue();
 			} else if ( isLong() ) {
-				r = longValue() == val.longValue();
+				r = safeLongValue() == val.safeLongValue();
 			} else if ( valueObject() != null ) {
 				r = valueObject().equals( val.valueObject() );
 			}
@@ -613,17 +619,20 @@ public abstract class Value implements Expression, Cloneable
 		return (CommChannel)o;
 	}
 	
-	public String strValue()
+	public String strValue() throws TypeCastingException
 	{
-		try {
-			return strValueStrict();
-		} catch( TypeCastingException e ) {
-			return "";
-		}
+                return strValueStrict();
 	}
+    
+    public String safeStrValue() {
+            String safeStr = "";
+            try {
+                    safeStr = strValueStrict();
+            } catch ( TypeCastingException  e ){}
+            return safeStr;
+    }
 
-	public final String strValueStrict()
-		throws TypeCastingException
+	public final String strValueStrict() throws TypeCastingException
 	{
 		Object o = valueObject();
 		if ( o == null ) {
@@ -643,8 +652,7 @@ public abstract class Value implements Expression, Cloneable
 		}
 	}
 
-	public ByteArray byteArrayValueStrict()
-		throws TypeCastingException
+	public ByteArray byteArrayValueStrict() throws TypeCastingException
 	{
 		ByteArray r = null;
 		Object o = valueObject();
@@ -694,33 +702,37 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public int intValue()
+	public int intValue() throws TypeCastingException
 	{
-		try {
-			return intValueStrict();
-		} catch( TypeCastingException e ) {
-			return 0;
-		}
+            return intValueStrict();
 	}
+    
+    public int safeIntValue()
+    {
+            int intValue = 0;
+            try {
+                intValue = intValueStrict();
+            } catch ( TypeCastingException e ){}
+            return intValue;
+    }
 	
-	public final int intValueStrict()
-		throws TypeCastingException
+	public final int intValueStrict() throws TypeCastingException
 	{
 		int r = 0;
 		Object o = valueObject();
 		if ( o == null ) {
 			throw new TypeCastingException();
 		} else if ( o instanceof Integer ) {
-			r = ((Integer)o).intValue();
+			r = ( Integer ) o ;
 		} else if ( o instanceof Double ) {
-			r = ((Double)o).intValue();
+			r = ( ( Double ) o ).intValue();
 		} else if ( o instanceof Long ) {
-			r = ((Long)o).intValue();
+			r = ( ( Long ) o ).intValue();
 		} else if ( o instanceof Boolean ) {
-			r = ( ((Boolean) o).booleanValue() == true ) ? 1 : 0;
+			r = ( ( Boolean ) o ) ? 1 : 0;
 		} else if ( o instanceof String ) {
 			try {
-				r = Integer.parseInt( ((String)o).trim() );
+				r = Integer.parseInt( ( ( String ) o ).trim() );
 			} catch( NumberFormatException nfe ) {
 				throw new TypeCastingException();
 			}
@@ -734,24 +746,28 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public boolean boolValue()
+	public boolean boolValue() throws TypeCastingException
 	{
-		try {
-			return boolValueStrict();
-		} catch( TypeCastingException e ) {
-			return false;
-		}
+            return boolValueStrict();
 	}
+    
+    public boolean safeBoolValue() 
+    {
+            boolean boolValue = false;
+            try {
+                boolValue = boolValueStrict();
+            } catch ( TypeCastingException e ){}
+            return boolValue;
+    }
 	
-	public boolean boolValueStrict()
-		throws TypeCastingException
+	public boolean boolValueStrict() throws TypeCastingException
 	{
 		boolean r = false;
 		Object o = valueObject();
 		if ( o == null ) {
 			throw new TypeCastingException();
 		} else if ( o instanceof Boolean ) {
-			r = ((Boolean) o).booleanValue();
+			r = ( Boolean ) o;
 		} else if ( o instanceof Number ) {
 			if ( ((Number) o).longValue() > 0 ) {
 				r = true;
@@ -760,7 +776,7 @@ public abstract class Value implements Expression, Cloneable
 			r = Boolean.parseBoolean( ((String)o).trim() );
 		} else if ( o instanceof ByteArray ) {
 			try {
-				return new DataInputStream( new ByteArrayInputStream( ((ByteArray)o).getBytes() ) ).readBoolean();
+				return new DataInputStream( new ByteArrayInputStream( ( ( ByteArray ) o ).getBytes() ) ).readBoolean();
 			} catch( IOException e ) {
 				throw new TypeCastingException();
 			}
@@ -769,39 +785,42 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public long longValue()
+	public long longValue() throws TypeCastingException
 	{
-		try {
-			return longValueStrict();
-		} catch( TypeCastingException e ) {
-			return 0L;
-		}
+            return longValueStrict();
 	}
+    
+    public long safeLongValue() {
+            long longValue = 0L;
+            try {
+                longValue = longValueStrict();
+            } catch ( TypeCastingException e ){}
+            return longValue;
+    }
 	
-	public final long longValueStrict()
-		throws TypeCastingException
+	public final long longValueStrict() throws TypeCastingException
 	{
 		long r = 0L;
 		Object o = valueObject();
 		if ( o == null ) {
 			throw new TypeCastingException();
 		} else if ( o instanceof Long ) {
-			r = ((Long)o).longValue();
+			r = ( Long ) o;
 		} else if ( o instanceof Integer ) {
-			r = ((Integer)o).longValue(); // added by Balint Maschio
+			r = ( ( Integer ) o ).longValue(); // added by Balint Maschio
 		} else if ( o instanceof Boolean ) {
-			r = ( ((Boolean) o).booleanValue() == true ) ? 1L : 0L;
+			r = ( ( ( Boolean ) o ) ) ? 1L : 0L;
 		} else if ( o instanceof Double ) {
-			r = ((Double)o).longValue();
+			r = ( ( Double ) o ).longValue();
 		} else if ( o instanceof String ) {
 			try {
-				r = Long.parseLong( ((String)o).trim() );
+				r = Long.parseLong( ( ( String ) o ).trim() );
 			} catch( NumberFormatException nfe ) {
 				throw new TypeCastingException();
 			}
 		} else if ( o instanceof ByteArray ) {
 			try {
-				return new DataInputStream( new ByteArrayInputStream( ((ByteArray)o).getBytes() ) ).readLong();
+				return new DataInputStream( new ByteArrayInputStream( ( (ByteArray) o ).getBytes() ) ).readLong();
 			} catch( IOException e ) {
 				throw new TypeCastingException();
 			}
@@ -809,30 +828,33 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public double doubleValue()
+	public double doubleValue() throws TypeCastingException
 	{
-		try {
-			return doubleValueStrict();
-		} catch( TypeCastingException e ) {
-			return 0.0;
-		}
+            return doubleValueStrict();
 	}
+    
+    public double safeDoubleValue() {
+            double doubleValue = 0.0;
+            try {
+                doubleValue = doubleValueStrict();
+            } catch ( TypeCastingException e ){}
+            return doubleValue;
+    }
 	
-	public final double doubleValueStrict()
-		throws TypeCastingException
+	public final double doubleValueStrict() throws TypeCastingException
 	{
 		double r = 0.0;
 		Object o = valueObject();
 		if ( o == null ) {
 			throw new TypeCastingException();
 		} else if ( o instanceof Integer ) {
-			r = ((Integer)o).doubleValue();
+			r = ( ( Integer ) o ).doubleValue();
 		} else if ( o instanceof Double ) {
-			r = ((Double)o).doubleValue();
+			r = ( ( Double ) o );
 		} else if ( o instanceof Long ) {
-			r = ((Long)o).doubleValue();
+			r = ( ( Long ) o ).doubleValue();
 		} else if ( o instanceof Boolean ) {
-			r = ( ((Boolean) o).booleanValue() == true ) ? 1.0 : 0.0;
+			r = ( ( ( Boolean ) o ) ) ? 1.0 : 0.0;
 		} else if ( o instanceof String ) {
 			try {
 				r = Double.parseDouble( ((String)o).trim() );
@@ -849,7 +871,7 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public final synchronized void add( Value val )
+	public final synchronized void add( Value val ) throws TypeCastingException
 	{
 		if ( isDefined() ) {
 			if ( val.isString() ) {
@@ -870,7 +892,7 @@ public abstract class Value implements Expression, Cloneable
 		}
 	}
 	
-	public final synchronized void subtract( Value val )
+	public final synchronized void subtract( Value val ) throws TypeCastingException
 	{
 		if ( !isDefined() ) {
 			if ( val.isDouble() ) {
@@ -893,7 +915,7 @@ public abstract class Value implements Expression, Cloneable
 		}
 	}
 	
-	public synchronized final void multiply( Value val )
+	public synchronized final void multiply( Value val ) throws TypeCastingException
 	{
 		if ( isDefined() ) {
 			if ( isInt() ) {
@@ -910,7 +932,7 @@ public abstract class Value implements Expression, Cloneable
 		}
 	}
 	
-	public synchronized final void divide( Value val )
+	public synchronized final void divide( Value val ) throws TypeCastingException, ArithmeticException
 	{
 		if ( !isDefined() ) {
 			setValue( 0 );
@@ -923,7 +945,7 @@ public abstract class Value implements Expression, Cloneable
 		}
 	}
 	
-	public synchronized final void modulo( Value val )
+	public synchronized final void modulo( Value val ) throws TypeCastingException
 	{
 		if ( !isDefined() ) {
 			assignValue( val );

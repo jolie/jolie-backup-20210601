@@ -22,8 +22,8 @@
 package jolie.runtime;
 
 import java.io.ByteArrayOutputStream;
-
 import java.io.PrintStream;
+import jolie.runtime.typing.TypeCastingException;
 
 /**
  * Java representation for a Jolie fault.
@@ -101,7 +101,12 @@ public class FaultException extends Exception
 		StringBuilder builder = new StringBuilder();
 		builder.append( faultName );
 		builder.append( ": " );
-		builder.append( value.strValue() );
+                try {
+                        builder.append( value.strValue() );
+                } catch ( TypeCastingException e ){
+                        builder.append( "Exception in parsing Exception message" );
+                }
+		
 		return builder.toString();
 	}
 

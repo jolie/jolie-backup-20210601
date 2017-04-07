@@ -24,12 +24,14 @@ package jolie.runtime.expression;
 
 import jolie.lang.Constants;
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 
 public interface Expression
 {
-	public Value evaluate();
+	public Value evaluate() throws FaultException;
 	public Expression cloneExpression( TransformationReason reason );
+    public String TYPE_CASTING_EXCEPTION = "TypeCastingException";
 	
 	public class Operand
 	{

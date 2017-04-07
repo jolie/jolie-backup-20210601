@@ -22,7 +22,9 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public class CastDoubleExpression implements Expression
 {
@@ -38,8 +40,16 @@ public class CastDoubleExpression implements Expression
 		return new CastDoubleExpression( expression.cloneExpression( reason ) );
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
-		return Value.create( expression.evaluate().doubleValue() );
+		Value v;
+        try {
+            v = Value.create( expression.evaluate().doubleValue() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException( 
+              TYPE_CASTING_EXCEPTION, 
+              "Could to cast expression to a double value" );
+        }
+        return v;
 	}
 }

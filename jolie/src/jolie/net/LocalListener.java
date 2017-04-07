@@ -31,6 +31,7 @@ import jolie.net.ports.InputPort;
 import jolie.net.ports.Interface;
 import jolie.net.protocols.CommProtocol;
 import jolie.runtime.ClosedVariablePath;
+import jolie.runtime.FaultException;
 import jolie.runtime.VariablePath;
 import jolie.runtime.VariablePathBuilder;
 import jolie.runtime.typing.OneWayTypeDescription;
@@ -77,7 +78,12 @@ public class LocalListener extends CommListener
 				new HashMap< String, OutputPort >()
 			) : inputPort
 		);
-		locationPath.getValue().setValue( Constants.LOCAL_LOCATION_KEYWORD );
+        try {
+            locationPath.getValue().setValue( Constants.LOCAL_LOCATION_KEYWORD );
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+		
 	}
 	
 	public void mergeInterface( Interface iface )

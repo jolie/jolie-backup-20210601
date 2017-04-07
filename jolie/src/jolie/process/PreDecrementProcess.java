@@ -22,9 +22,12 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
+import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.VariablePath;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public class PreDecrementProcess implements Process, Expression
 {
@@ -45,18 +48,32 @@ public class PreDecrementProcess implements Process, Expression
 		return new PreDecrementProcess( (VariablePath)path.cloneExpression( reason ) );
 	}
 	
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() )
 			return;
 		Value val = path.getValue();
-		val.setValue( val.intValue() - 1 );
+        try {
+            val.setValue( val.intValue() - 1 );   
+        } catch ( TypeCastingException e ){        
+        throw new FaultException(
+              Constants.CASTING_EXCEPTION_FAULT_NAME,
+              "Could not decrement a non-integer value"
+            );
+        }
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = path.getValue();
-		val.setValue( val.intValue() - 1 );
+        try {
+            val.setValue( val.intValue() - 1 );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not decrement a non-integer value"
+            );
+        }
 		return val;
 	}
 	

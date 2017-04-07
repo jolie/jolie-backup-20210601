@@ -74,11 +74,16 @@ public class ScopeProcess implements Process
 			} catch( FaultException f ) {
 				p = ethread.getFaultHandler( f.faultName(), true );
 				if ( p != null ) {
-					Value scopeValue =
+					Value scopeValue = null;
+                    try{
+                        scopeValue =
 							new VariablePathBuilder( false )
 							.add( ethread.currentScopeId(), 0 )
 							.toVariablePath()
 							.getValue();
+                    } catch ( FaultException e ){
+                        e.printStackTrace();
+                    }
 					scopeValue.getChildren( f.faultName() ).set( 0, f.value() );
                                         scopeValue.getFirstChild( Constants.Keywords.DEFAULT_HANDLER_NAME ).setValue( f.faultName() );
 					this.runScope( p );

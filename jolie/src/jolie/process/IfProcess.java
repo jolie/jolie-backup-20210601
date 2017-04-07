@@ -86,7 +86,7 @@ public final class IfProcess implements Process
 	
 		while( keepRun && i < pairs.length ) {
 			final CPPair pair = pairs[ i ];
-			if ( pair.condition().evaluate().boolValue() ) {
+			if ( pair.condition().evaluate().safeBoolValue() ) {
 				keepRun = false;
 				pair.process().run();
 			}

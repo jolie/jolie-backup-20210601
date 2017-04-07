@@ -35,7 +35,7 @@ public class SecurityUtils extends JavaService
 	public ByteArray secureRandom( Value request )
 		throws FaultException
 	{
-		byte[] bb = new byte[ request.getFirstChild( "size" ).intValue() ];
+		byte[] bb = new byte[ request.getFirstChild( "size" ).safeIntValue() ];
 		random.nextBytes( bb );
 		return new ByteArray( bb );
 	}

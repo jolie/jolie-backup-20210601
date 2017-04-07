@@ -22,9 +22,11 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
+import jolie.runtime.typing.TypeCastingException;
 
 /**
  * Subtract an expression value from a VariablePath's value, assigning the resulting
@@ -64,20 +66,36 @@ public class SubtractAssignmentProcess implements Process, Expression
 	}
 
 	/** Evaluates the expression and adds its value to the variable's value. */
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() ) {
 			return;
 		}
+        try {
+    		varPath.getValue().subtract( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException (
+              "TypeCastingException",
+              "Could not cast value to compute the subtraction"
+            );
+        }
 
-		varPath.getValue().subtract( expression.evaluate() );
 	}
 
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = varPath.getValue();
-		val.subtract( expression.evaluate() );
-		return val;
+        try {
+            val.subtract( expression.evaluate() );
+            
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+              "TypeCastingException",
+              "Could not cast value to compute the subtraction"
+            );
+        }
+		
+        return val;
 	}
 
 	public boolean isKillable()

@@ -22,9 +22,9 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.VariablePath;
-import jolie.runtime.InvalidIdException;
 import jolie.runtime.Value;
 
 /** Assigns an expression value to a VariablePath.
@@ -65,14 +65,14 @@ public class AssignmentProcess implements Process, Expression
 	}
 	
 	/** Evaluates the expression and stores its value in the variable. */
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() )
 			return;
 		varPath.getValue().assignValue( expression.evaluate() );
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = varPath.getValue();
 		val.assignValue( expression.evaluate() );

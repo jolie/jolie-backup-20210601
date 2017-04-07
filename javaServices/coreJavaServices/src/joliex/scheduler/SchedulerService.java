@@ -47,12 +47,12 @@ public class SchedulerService extends JavaService
 		int start_min = 0;
 		ValueVector vec;
 		if ( (vec = request.children().get( "operation" )) != null ) {
-			callbackOperation = vec.first().strValue();
+			callbackOperation = vec.first().safeStrValue();
 		}
 		/*else { callbackValue = vec.first(); }
 		 */
 		if ( (vec = request.children().get( "start_hour" )) != null ) {
-			start_hour = vec.first().intValue();
+			start_hour = vec.first().safeIntValue();
 		} else {//dovrebbe partire un TypeMismatch jolie
 			System.out.println( " start_hour not present:It will be set to currente date" );
 		}/*
@@ -103,19 +103,19 @@ public class SchedulerService extends JavaService
 		Date startDate = new Date();
 		ValueVector vec;
 		if ( (vec = request.children().get( "operation" )) != null ) {
-			callbackOperation = vec.first().strValue();
+			callbackOperation = vec.first().safeStrValue();
 		}
 		/*else { callbackValue = vec.first(); }
 		 */
 		if ( (vec = request.children().get( "start_date" )) != null ) {
 			System.out.println( " start_date =" + vec.first() );
 			GregorianCalendar gc = new GregorianCalendar();
-			gc.add( GregorianCalendar.YEAR, vec.get( 1 ).getChildren( "year" ).get( 0 ).intValue() );
-			gc.add( GregorianCalendar.MONTH + 1, vec.get( 1 ).getChildren( "month" ).get( 0 ).intValue() );
-			gc.add( GregorianCalendar.DAY_OF_MONTH, vec.get( 1 ).getChildren( "day" ).get( 0 ).intValue() );
-			gc.add( GregorianCalendar.MINUTE, vec.get( 1 ).getChildren( "min" ).get( 0 ).intValue() );
-			gc.add( GregorianCalendar.SECOND, vec.get( 1 ).getChildren( "sec" ).get( 0 ).intValue() );
-			gc.add( GregorianCalendar.MILLISECOND, vec.get( 1 ).getChildren( "msec" ).get( 0 ).intValue() );
+			gc.add( GregorianCalendar.YEAR, vec.get( 1 ).getChildren( "year" ).get( 0 ).safeIntValue() );
+			gc.add( GregorianCalendar.MONTH + 1, vec.get( 1 ).getChildren( "month" ).get( 0 ).safeIntValue() );
+			gc.add( GregorianCalendar.DAY_OF_MONTH, vec.get( 1 ).getChildren( "day" ).get( 0 ).safeIntValue() );
+			gc.add( GregorianCalendar.MINUTE, vec.get( 1 ).getChildren( "min" ).get( 0 ).safeIntValue() );
+			gc.add( GregorianCalendar.SECOND, vec.get( 1 ).getChildren( "sec" ).get( 0 ).safeIntValue() );
+			gc.add( GregorianCalendar.MILLISECOND, vec.get( 1 ).getChildren( "msec" ).get( 0 ).safeIntValue() );
 			startDate = gc.getTime();
 		} else {
 			System.out.println( " start_date not present:set to current date" );
@@ -129,7 +129,7 @@ public class SchedulerService extends JavaService
 		 */
 		if ( (vec = request.children().get( "period" )) != null ) {
 			//System.out.println(" vec.get(0)=" + vec.get(0).strValue());
-			period = Long.valueOf( vec.get( 0 ).intValue() );
+			period = Long.valueOf( vec.get( 0 ).safeIntValue() );
 			System.out.println( " period=" + period );
 			//TODO:
 		} else {

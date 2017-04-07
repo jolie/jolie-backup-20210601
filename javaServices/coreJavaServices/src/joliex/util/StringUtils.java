@@ -33,6 +33,7 @@ import jolie.runtime.JavaService;
 import jolie.runtime.Value;
 import jolie.runtime.ValuePrettyPrinter;
 import jolie.runtime.ValueVector;
+import jolie.runtime.typing.TypeCastingException;
 
 public class StringUtils extends JavaService
 {
@@ -46,7 +47,7 @@ public class StringUtils extends JavaService
 		String[] list = new String[ request.getChildren( "item" ).size() ];
 		int i = 0;
 		for( Value v : request.getChildren( "item" ) ) {
-			list[ i++ ] = v.strValue();
+			list[ i++ ] = v.safeStrValue();
 		}
 		Arrays.sort( list );
 		Value ret = Value.create();
@@ -64,9 +65,9 @@ public class StringUtils extends JavaService
 		public static ReplaceRequest fromValue( Value value )
 		{
 			ReplaceRequest ret = new ReplaceRequest();
-			ret.self = value.strValue();
-			ret.regex = value.getFirstChild( "regex" ).strValue();
-			ret.replacement = value.getFirstChild( "replacement" ).strValue();
+			ret.self = value.safeStrValue();
+			ret.regex = value.getFirstChild( "regex" ).safeStrValue();
+			ret.replacement = value.getFirstChild( "replacement" ).safeStrValue();
 			return ret;
 		}
 		public static Value toValue( ReplaceRequest p )
@@ -99,8 +100,8 @@ public class StringUtils extends JavaService
 		public static StartsWithRequest fromValue( Value value )
 		{
 			StartsWithRequest ret = new StartsWithRequest();
-			ret.self = value.strValue();
-			ret.prefix = value.getFirstChild( "prefix" ).strValue();
+			ret.self = value.safeStrValue();
+			ret.prefix = value.getFirstChild( "prefix" ).safeStrValue();
 			return ret;
 		}
 		public static Value toValue( StartsWithRequest p )
@@ -123,8 +124,8 @@ public class StringUtils extends JavaService
             private EndsWithRequest() {}
             public static EndsWithRequest fromValue( Value value ) {
                 EndsWithRequest ret = new EndsWithRequest();
-                ret.self = value.strValue();
-                ret.suffix = value.getFirstChild("suffix").strValue();
+                ret.self = value.safeStrValue();
+                ret.suffix = value.getFirstChild("suffix").safeStrValue();
                 return ret;
             }
             public static Value toValue( EndsWithRequest request ) {
@@ -148,7 +149,7 @@ public class StringUtils extends JavaService
 		public static JoinRequest fromValue( Value value )
 		{
 			JoinRequest ret = new JoinRequest();
-			ret.delimiter = value.getFirstChild( "delimiter" ).strValue();
+			ret.delimiter = value.getFirstChild( "delimiter" ).safeStrValue();
 			ret.pieces = value.getChildren( "piece" );
 			return ret;
 		}
@@ -169,9 +170,9 @@ public class StringUtils extends JavaService
 		if ( size >= 0 ) {
 			int i;
 			for( i = 0; i < size; i++ ) {
-				builder.append( request.pieces.get( i ).strValue() ).append( request.delimiter );
+				builder.append( request.pieces.get( i ).safeStrValue() ).append( request.delimiter );
 			}
-			builder.append( request.pieces.get( i ).strValue() );
+			builder.append( request.pieces.get( i ).safeStrValue() );
 		}
 		return builder.toString();
 	}
@@ -184,15 +185,15 @@ public class StringUtils extends JavaService
 	public String substring( Value request )
 	{
 		String subst;
-		if ( request.strValue().length() < request.getFirstChild( "end" ).intValue() ) {
-			subst = request.strValue().substring(
-				request.getFirstChild( "begin" ).intValue(),
-				request.strValue().length()
+		if ( request.safeStrValue().length() < request.getFirstChild( "end" ).safeIntValue() ) {
+			subst = request.safeStrValue().substring(
+				request.getFirstChild( "begin" ).safeIntValue(),
+				request.safeStrValue().length()
 			);
 		} else {
-			subst = request.strValue().substring(
-				request.getFirstChild( "begin" ).intValue(),
-				request.getFirstChild( "end" ).intValue()
+			subst = request.safeStrValue().substring(
+				request.getFirstChild( "begin" ).safeIntValue(),
+				request.getFirstChild( "end" ).safeIntValue()
 			);
 		}
 		return subst;
@@ -200,19 +201,24 @@ public class StringUtils extends JavaService
 
 	public Value split( Value request )
 	{
-		String str = request.strValue();
+		String str = request.safeStrValue();
 		int limit = 0;
 		Value lValue = request.getFirstChild( "limit" );
 		if ( lValue.isDefined() ) {
-			limit = lValue.intValue();
+			limit = lValue.safeIntValue();
 		}
 		String[] ss = str.split(
-				request.getFirstChild( "regex" ).strValue(),
+				request.getFirstChild( "regex" ).safeStrValue(),
 				limit
 			);
 		Value value = Value.create();
 		for( String s : ss ) {
-			value.getNewChild( "result" ).add( Value.create( s ) );
+            try {
+                value.getNewChild( "result" ).add( Value.create( s ) );
+            } catch ( TypeCastingException e ){
+                e.printStackTrace();
+            }
+			
 		}
 
 		return value;
@@ -220,8 +226,8 @@ public class StringUtils extends JavaService
 
 	public Value splitByLength( Value request )
 	{
-		String str = request.strValue();
-		int length = request.getFirstChild( "length" ).intValue();
+		String str = request.safeStrValue();
+		int length = request.getFirstChild( "length" ).safeIntValue();
 		Value responseValue = Value.create();
 		ValueVector result = responseValue.getChildren( "result" );
 		int stringLength = str.length();
@@ -240,8 +246,8 @@ public class StringUtils extends JavaService
 
 	public Value match( Value request )
 	{
-		Pattern p = Pattern.compile( request.getFirstChild( "regex" ).strValue() );
-		Matcher m = p.matcher( request.strValue() );
+		Pattern p = Pattern.compile( request.getFirstChild( "regex" ).safeStrValue() );
+		Matcher m = p.matcher( request.safeStrValue() );
 		Value response = Value.create();
 		if ( m.matches() ) {
 			response.setValue( 1 );
@@ -260,8 +266,8 @@ public class StringUtils extends JavaService
 	
 	public Value find( Value request )
 	{
-		Pattern p = Pattern.compile( request.getFirstChild( "regex" ).strValue() );
-		Matcher m = p.matcher( request.strValue() );
+		Pattern p = Pattern.compile( request.getFirstChild( "regex" ).safeStrValue() );
+		Matcher m = p.matcher( request.safeStrValue() );
 		Value response = Value.create();
 		if ( m.find() ) {
 			response.setValue( 1 );
@@ -280,13 +286,13 @@ public class StringUtils extends JavaService
 
 	public String leftPad( Value request )
 	{
-		String orig = request.strValue();
-		int length = request.getFirstChild( "length" ).intValue();
+		String orig = request.safeStrValue();
+		int length = request.getFirstChild( "length" ).safeIntValue();
 		if ( orig.length() >= length ) {
 			return orig;
 		}
 
-		char padChar = request.getFirstChild( "char" ).strValue().charAt( 0 );
+		char padChar = request.getFirstChild( "char" ).safeStrValue().charAt( 0 );
 
 		StringBuilder builder = new StringBuilder();
 		int padLength = length - orig.length();
@@ -309,21 +315,21 @@ public class StringUtils extends JavaService
 	
 	public Value indexOf( Value request )
 	{
-		String string = request.strValue();
+		String string = request.safeStrValue();
 		Value response = Value.create();
-		response.setValue( string.indexOf( request.getFirstChild( "word" ).strValue()) );
+		response.setValue( string.indexOf( request.getFirstChild( "word" ).safeStrValue()) );
 		return response;
 	}
 
 	public String rightPad( Value request )
 	{
-		String orig = request.strValue();
-		int length = request.getFirstChild( "length" ).intValue();
+		String orig = request.safeStrValue();
+		int length = request.getFirstChild( "length" ).safeIntValue();
 		if ( orig.length() >= length ) {
 			return orig;
 		}
 
-		char padChar = request.getFirstChild( "char" ).strValue().charAt( 0 );
+		char padChar = request.getFirstChild( "char" ).safeStrValue().charAt( 0 );
 
 		StringBuilder builder = new StringBuilder();
 		builder.append( orig );
@@ -351,6 +357,6 @@ public class StringUtils extends JavaService
 	
 	public Boolean contains( Value request )
 	{
-		return request.strValue().contains( request.getFirstChild( "substring" ).strValue() );
+		return request.safeStrValue().contains( request.getFirstChild( "substring" ).safeStrValue() );
 	}
 }

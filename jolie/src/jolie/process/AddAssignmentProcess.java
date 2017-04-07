@@ -22,9 +22,12 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 import jolie.runtime.expression.Expression;
+import jolie.runtime.typing.TypeCastingException;
 
 /**
  * Add an expression value to a VariablePath's value, assigning the resulting
@@ -64,18 +67,34 @@ public class AddAssignmentProcess implements Process, Expression
 	}
 
 	/** Evaluates the expression and adds its value to the variable's value. */
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() ) {
 			return;
 		}
-		varPath.getValue().add( expression.evaluate() );
+        try {
+            varPath.getValue().add( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not sum elements of non-matching types"
+            );
+        }
+		
 	}
 
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = varPath.getValue();
+        try {
+            
 		val.add( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not sum elements of non-matching types"
+            );
+        }
 		return val;
 	}
 

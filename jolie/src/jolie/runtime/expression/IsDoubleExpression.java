@@ -23,6 +23,7 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 
@@ -40,7 +41,7 @@ public class IsDoubleExpression implements Expression
 		return new IsDoubleExpression( path );
 	}
 
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value value = path.getValueOrNull();
 		return Value.create( value != null && value.isDouble() );

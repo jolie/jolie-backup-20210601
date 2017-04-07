@@ -22,7 +22,9 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public class ProductExpression implements Expression
 {
@@ -45,23 +47,28 @@ public class ProductExpression implements Expression
 	}
 	
 	@Override
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = Value.create( children[0].expression().evaluate() );
-		for( int i = 1; i < children.length; i++ ) {
-			switch( children[i].type() ) {
-			case MULTIPLY:
-				val.multiply( children[i].expression().evaluate() );
-				break;
-			case DIVIDE:
-				val.divide( children[i].expression().evaluate() );
-				break;
-			case MODULUS:
-				val.modulo( children[i].expression().evaluate() );
-				break;
-			}
-		}
-		
+        try {
+            for( int i = 1; i < children.length; i++ ) {
+                switch( children[i].type() ) {
+                case MULTIPLY:
+                    val.multiply( children[i].expression().evaluate() );
+                    break;
+                case DIVIDE:
+                    val.divide( children[i].expression().evaluate() );
+                    break;
+                case MODULUS:
+                    val.modulo( children[i].expression().evaluate() );
+                    break;
+                }
+            }
+        } catch ( TypeCastingException e ){
+            throw new FaultException( 
+              TYPE_CASTING_EXCEPTION, 
+              "Could to cast expression to a computable value");
+        }
 		return val;
 	}
 }

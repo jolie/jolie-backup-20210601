@@ -100,7 +100,7 @@ public class ConsoleService extends JavaService
 	public void registerForInput( Value request )
 	{
 		if ( request.getFirstChild( "enableSessionListener" ).isDefined() ) {
-			if ( request.getFirstChild( "enableSessionListener" ).boolValue() ) {
+			if ( request.getFirstChild( "enableSessionListener" ).safeBoolValue() ) {
 				sessionListeners = true;
 				sessionTokens = new HashMap<>();
 			}
@@ -157,11 +157,11 @@ public class ConsoleService extends JavaService
 	@RequestResponse
 	public void enableTimestamp( Value request )
 	{
-		boolean enable = request.boolValue();
+		boolean enable = request.safeBoolValue();
 		if ( enable ) {
 			enableTimestamp = true;
 			if ( request.getFirstChild( "format" ).isDefined() ) {
-				timestampFormat = request.getFirstChild( "format" ).strValue();
+				timestampFormat = request.getFirstChild( "format" ).safeStrValue();
 			} else {
 				timestampFormat = timestampFormatDefault;
 			}
@@ -175,7 +175,7 @@ public class ConsoleService extends JavaService
 	@RequestResponse
 	public void subscribeSessionListener( Value request )
 	{
-		String token = request.getFirstChild( "token" ).strValue();
+		String token = request.getFirstChild( "token" ).safeStrValue();
 
 		if ( sessionListeners ) {
 			sessionTokens.put( token, token );
@@ -186,7 +186,7 @@ public class ConsoleService extends JavaService
 	@RequestResponse
 	public void unsubscribeSessionListener( Value request )
 	{
-		String token = request.getFirstChild( "token" ).strValue();
+		String token = request.getFirstChild( "token" ).safeStrValue();
 
 		if ( sessionListeners ) {
 			sessionTokens.remove( token );

@@ -38,27 +38,27 @@ public class JavaServiceHelpers
 	
 	public static Long valueToLong( Value value )
 	{
-		return value.longValue();
+		return value.safeLongValue();
 	}
 	
 	public static Boolean valueToBoolean( Value value )
 	{
-		return value.boolValue();
+		return value.safeBoolValue();
 	}
 
 	public static Integer valueToInteger( Value value )
 	{
-		return value.intValue();
+		return value.safeIntValue();
 	}
 
 	public static String valueToString( Value value )
 	{
-		return value.strValue();
+		return value.safeStrValue();
 	}
 
 	public static Double valueToDouble( Value value )
 	{
-		return value.doubleValue();
+		return value.safeDoubleValue();
 	}
 
 	public static ByteArray valueToByteArray( Value value )

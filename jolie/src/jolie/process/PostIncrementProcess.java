@@ -20,9 +20,12 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 import jolie.runtime.expression.Expression;
+import jolie.runtime.typing.TypeCastingException;
 
 public class PostIncrementProcess implements Process, Expression
 {
@@ -46,20 +49,37 @@ public class PostIncrementProcess implements Process, Expression
 	}
 	
 	@Override
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() )
 			return;
 		final Value val = path.getValue();
-		val.setValue( val.intValue() + 1 );
+        try {
+            val.setValue( val.intValue() + 1 );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not increment a non-integer value"
+            );
+        }
+		
 	}
 	
 	@Override
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		final Value val = path.getValue();
-		final Value orig = Value.create( val.intValue() );
-		val.setValue( val.intValue() + 1 );
+		final Value orig = Value.create();
+        try {
+            orig.setValue( val.intValue() );
+            val.setValue( val.intValue() + 1 );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not increment a non-integer value"
+            );
+        }
+        
 		return orig;
 	}
 	

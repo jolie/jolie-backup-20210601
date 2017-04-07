@@ -40,16 +40,16 @@ public class ExecService extends JavaService
 		throws FaultException
 	{
 		List< String > command = new LinkedList< String >();
-		String[] str = request.strValue().split( " " );
+		String[] str = request.safeStrValue().split( " " );
 		command.addAll( Arrays.asList( str ) );
 
 		for( Value v : request.getChildren( "args" ) ) {
-			command.add( v.strValue() );
+			command.add( v.safeStrValue() );
 		}
 
 		ProcessBuilder builder = new ProcessBuilder( command );
 		if ( request.hasChildren( "workingDirectory" ) ) {
-			builder.directory( new File( request.getFirstChild( "workingDirectory" ).strValue() ) );
+			builder.directory( new File( request.getFirstChild( "workingDirectory" ).safeStrValue() ) );
 		}
 		try {
 

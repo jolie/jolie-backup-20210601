@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.Map;
 import jolie.lang.Constants;
 import jolie.net.AggregatedOperation;
+import jolie.runtime.FaultException;
 import jolie.runtime.VariablePath;
 import jolie.runtime.typing.OperationTypeDescription;
 
@@ -119,12 +120,23 @@ public class InputPort implements Port
 	 */
 	public URI location()
 	{
-		return URI.create( locationVariablePath.getValue().strValue() );
+		URI uri = null;
+        try {
+            uri = URI.create( locationVariablePath.getValue().safeStrValue() );
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+        return uri;
 	}
 	
 	public void setLocation( String location )
 	{
-		locationVariablePath.getValue().setValue( location );
+		try {
+            locationVariablePath.getValue().setValue( location );
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+        
 	}
 
 	/**

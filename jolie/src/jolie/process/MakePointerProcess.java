@@ -22,6 +22,7 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.runtime.FaultException;
 import jolie.runtime.VariablePath;
 
 public class MakePointerProcess implements Process
@@ -47,7 +48,12 @@ public class MakePointerProcess implements Process
 		if ( ExecutionThread.currentThread().isKilled() )
 			return;
 
-		leftPath.makePointer( rightPath );
+        try {
+            leftPath.makePointer( rightPath );
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+		
 	}
 	
 	public boolean isKillable()

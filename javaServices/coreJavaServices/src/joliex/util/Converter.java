@@ -43,7 +43,7 @@ public class Converter extends JavaService
 	public ByteArray base64ToRaw( Value value )
 		throws FaultException
 	{
-		String stringValue = value.strValue();
+		String stringValue = value.safeStrValue();
 		Base64.Decoder decoder = Base64.getDecoder();
 		byte[] supportArray = decoder.decode( stringValue );
 		return new ByteArray( supportArray );
@@ -57,7 +57,7 @@ public class Converter extends JavaService
 
 		String charset = null;
 		if ( value.hasChildren( "charset" ) ) {
-			charset = value.getFirstChild( "charset" ).strValue();
+			charset = value.getFirstChild( "charset" ).safeStrValue();
 		}
 		try {
 			if ( charset != null ) {
@@ -74,11 +74,11 @@ public class Converter extends JavaService
 	public ByteArray stringToRaw( Value value )
 		throws FaultException
 	{
-		String str = value.strValue();
+		String str = value.safeStrValue();
 
 		String charset = null;
 		if ( value.hasChildren( "charset" ) ) {
-			charset = value.getFirstChild( "charset" ).strValue();
+			charset = value.getFirstChild( "charset" ).safeStrValue();
 		}
 		try {
 			if ( charset != null ) {

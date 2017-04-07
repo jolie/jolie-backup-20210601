@@ -178,6 +178,7 @@ import jolie.process.courier.ForwardNotificationProcess;
 import jolie.process.courier.ForwardSolicitResponseProcess;
 import jolie.runtime.ClosedVariablePath;
 import jolie.runtime.CompareOperators;
+import jolie.runtime.FaultException;
 import jolie.runtime.GlobalVariablePath;
 import jolie.runtime.InstallFixedVariablePath;
 import jolie.runtime.InvalidIdException;
@@ -579,7 +580,12 @@ public class OOITBuilder implements OLVisitor
 			.toVariablePath();
 		locationPath = new ClosedVariablePath( locationPath, interpreter.globalValue() );
 		// Process assignLocation = new AssignmentProcess( locationPath, Value.create( n.location().toString() ) );
-		locationPath.getValue().setValue( n.location().toString() );
+		try {
+            locationPath.getValue().setValue( n.location().toString() );
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
+        
 
 		VariablePath protocolPath =
 			new VariablePathBuilder( true )

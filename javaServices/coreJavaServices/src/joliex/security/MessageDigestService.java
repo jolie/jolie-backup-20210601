@@ -25,9 +25,11 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import jolie.lang.Constants;
 import jolie.runtime.FaultException;
 import jolie.runtime.JavaService;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public class MessageDigestService extends JavaService
 {
@@ -42,9 +44,11 @@ public class MessageDigestService extends JavaService
 			throw new FaultException( "UnsupportedOperation", e );
 		} catch( NoSuchAlgorithmException e ) {
 			throw new FaultException( "UnsupportedOperation", e );
-		}
+		} catch( TypeCastingException e ){
+            throw new FaultException( Constants.CASTING_EXCEPTION_FAULT_NAME, e );
+        }
 		int radix;
-		if ( (radix=request.getFirstChild( "radix" ).intValue()) < 2 ) {
+		if ( (radix=request.getFirstChild( "radix" ).safeIntValue()) < 2 ) {
 			radix = 16;
 		}
 

@@ -23,6 +23,7 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 
 public class NotExpression implements Expression
@@ -39,8 +40,8 @@ public class NotExpression implements Expression
 		return new NotExpression( expression.cloneExpression( reason ) );
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
-		return Value.create( !( expression.evaluate().boolValue() ) );
+		return Value.create( !( expression.evaluate().safeBoolValue() ) );
 	}
 }

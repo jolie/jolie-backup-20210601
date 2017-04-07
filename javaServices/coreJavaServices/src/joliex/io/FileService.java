@@ -108,7 +108,7 @@ public class FileService extends JavaService
 		throws FaultException
 	{
 		Interpreter.getInstance().logWarning( "convertFromBase64ToBinaryValue@FileService()() became base64ToRaw@Converter()()" );
-		String stringValue = value.strValue();
+		String stringValue = value.safeStrValue();
 		Base64.Decoder decoder = Base64.getDecoder();
 		byte[] supportArray = decoder.decode( stringValue );
 		return new ByteArray( supportArray );
@@ -233,7 +233,7 @@ public class FileService extends JavaService
 					request.getFirstChild( "filename" ).setValue( matcher.group( 2 ) );
 					request.getFirstChild( "format" ).setValue( "text" );
 					try {
-						propertyValue = readFile( request ).strValue();
+						propertyValue = readFile( request ).safeStrValue();
 					} catch( FaultException e ) {
 						throw new IOException( e );
 					}
@@ -274,8 +274,8 @@ public class FileService extends JavaService
 	{
 		Value retValue = Value.create();
 		retValue.setValue( true );
-		String fromDirName = request.getFirstChild( "from" ).strValue();
-		String toDirName = request.getFirstChild( "to" ).strValue();
+		String fromDirName = request.getFirstChild( "from" ).safeStrValue();
+		String toDirName = request.getFirstChild( "to" ).safeStrValue();
 		File fromDir = new File( fromDirName );
 		File toDir = new File( toDirName );
 		try {
@@ -295,14 +295,14 @@ public class FileService extends JavaService
 		Value filenameValue = request.getFirstChild( "filename" );
 
 		Value retValue = Value.create();
-		String format = request.getFirstChild( "format" ).strValue();
+		String format = request.getFirstChild( "format" ).safeStrValue();
 		Charset charset = null;
 		Value formatValue = request.getFirstChild( "format" );
 		if ( formatValue.hasChildren( "charset" ) ) {
-			charset = Charset.forName( formatValue.getFirstChild( "charset" ).strValue() );
+			charset = Charset.forName( formatValue.getFirstChild( "charset" ).safeStrValue() );
 		}
 
-		final File file = new File( filenameValue.strValue() );
+		final File file = new File( filenameValue.safeStrValue() );
 		InputStream istream = null;
 		long size;
 		try {
@@ -310,7 +310,7 @@ public class FileService extends JavaService
 				istream = new FileInputStream( file );
 				size = file.length();
 			} else {
-				URL fileURL = interpreter().getClassLoader().findResource( filenameValue.strValue() );
+				URL fileURL = interpreter().getClassLoader().findResource( filenameValue.safeStrValue() );
 				if ( fileURL != null && fileURL.getProtocol().equals( "jap" ) ) {
 					URLConnection conn = fileURL.openConnection();
 					if ( conn instanceof JapURLConnection ) {
@@ -321,10 +321,10 @@ public class FileService extends JavaService
 						}
 						istream = jarConn.getInputStream();
 					} else {
-						throw new FileNotFoundException( filenameValue.strValue() );
+						throw new FileNotFoundException( filenameValue.safeStrValue() );
 					}
 				} else {
-					throw new FileNotFoundException( filenameValue.strValue() );
+					throw new FileNotFoundException( filenameValue.safeStrValue() );
 				}
 			}
 
@@ -354,7 +354,7 @@ public class FileService extends JavaService
 						istream = new BufferedInputStream( istream );
 						boolean strictEncoding = false;
 						if ( request.getFirstChild( "format" ).hasChildren( "json_encoding" ) ) {
-							if ( request.getFirstChild( "format" ).getFirstChild( "json_encoding" ).strValue().equals( "strict" ) ) {
+							if ( request.getFirstChild( "format" ).getFirstChild( "json_encoding" ).safeStrValue().equals( "strict" ) ) {
 								strictEncoding = true;
 							}
 						}	readJsonIntoValue( istream, retValue, charset, strictEncoding );
@@ -543,7 +543,7 @@ public class FileService extends JavaService
 		} else {
 			writer = new FileWriter( file, append );
 		}
-		writer.write( value.strValue() );
+		writer.write( value.safeStrValue() );
 		writer.flush();
 		writer.close();
 	}
@@ -572,14 +572,14 @@ public class FileService extends JavaService
 	{
 		boolean append = false;
 		Value content = request.getFirstChild( "content" );
-		String format = request.getFirstChild( "format" ).strValue();
-		File file = new File( request.getFirstChild( "filename" ).strValue() );
-		if ( request.getFirstChild( "append" ).intValue() > 0 ) {
+		String format = request.getFirstChild( "format" ).safeStrValue();
+		File file = new File( request.getFirstChild( "filename" ).safeStrValue() );
+		if ( request.getFirstChild( "append" ).safeIntValue() > 0 ) {
 			append = true;
 		}
 		String encoding = null;
 		if ( request.getFirstChild( "format" ).hasChildren( "encoding" ) ) {
-			encoding = request.getFirstChild( "format" ).getFirstChild( "encoding" ).strValue();
+			encoding = request.getFirstChild( "format" ).getFirstChild( "encoding" ).safeStrValue();
 		}
 
 		try {
@@ -590,22 +590,22 @@ public class FileService extends JavaService
 			} else if ( "xml".equals( format ) ) {
 				String schemaFilename = null;
 				if ( request.getFirstChild( "format" ).hasChildren( "schema" ) ) {
-					schemaFilename = request.getFirstChild( "format" ).getFirstChild( "schema" ).strValue();
+					schemaFilename = request.getFirstChild( "format" ).getFirstChild( "schema" ).safeStrValue();
 				}
 				boolean indent = false;
 				if ( request.getFirstChild( "format" ).hasChildren( "indent" ) ) {
-					indent = request.getFirstChild( "format" ).getFirstChild( "indent" ).boolValue();
+					indent = request.getFirstChild( "format" ).getFirstChild( "indent" ).safeBoolValue();
 				}
 
 				String doctypePublic = null;
 				if ( request.getFirstChild( "format" ).hasChildren( "doctype_system" ) ) {
-					doctypePublic = request.getFirstChild( "format" ).getFirstChild( "doctype_system" ).strValue();
+					doctypePublic = request.getFirstChild( "format" ).getFirstChild( "doctype_system" ).safeStrValue();
 				}
 				writeXML( file, content, append, schemaFilename, doctypePublic, encoding, indent );
 			} else if ( "xml_store".equals( format ) ) {
 				boolean indent = false;
 				if ( request.getFirstChild( "format" ).hasChildren( "indent" ) ) {
-					indent = request.getFirstChild( "format" ).getFirstChild( "indent" ).boolValue();
+					indent = request.getFirstChild( "format" ).getFirstChild( "indent" ).safeBoolValue();
 				}
 				writeStorageXML( file, content, encoding, indent );
 			} else if ( "json".equals( format ) ) {
@@ -625,8 +625,8 @@ public class FileService extends JavaService
 	@RequestResponse
 	public Boolean delete( Value request )
 	{
-		String filename = request.strValue();
-		boolean isRegex = request.getFirstChild( "isRegex" ).intValue() > 0;
+		String filename = request.safeStrValue();
+		boolean isRegex = request.getFirstChild( "isRegex" ).safeIntValue() > 0;
 		boolean ret = true;
 		if ( isRegex ) {
 			File dir = new File( filename ).getAbsoluteFile().getParentFile();
@@ -647,15 +647,15 @@ public class FileService extends JavaService
 	@RequestResponse
 	public Boolean deleteDir( Value request )
 	{
-		return __deleteDir( new File( request.strValue() ) );
+		return __deleteDir( new File( request.safeStrValue() ) );
 	}
 
 	@RequestResponse
 	public void rename( Value request )
 		throws FaultException
 	{
-		String filename = request.getFirstChild( "filename" ).strValue();
-		String toFilename = request.getFirstChild( "to" ).strValue();
+		String filename = request.getFirstChild( "filename" ).safeStrValue();
+		String toFilename = request.getFirstChild( "to" ).safeStrValue();
 		if ( new File( filename ).renameTo( new File( toFilename ) ) == false ) {
 			throw new FaultException( "IOException" );
 		}
@@ -674,21 +674,21 @@ public class FileService extends JavaService
 	@RequestResponse
 	public Value list( Value request )
 	{
-		final File dir = new File( request.getFirstChild( "directory" ).strValue() );
+		final File dir = new File( request.getFirstChild( "directory" ).safeStrValue() );
                 boolean fileInfo = false;
                 if ( request.getFirstChild( "info" ).isDefined() ) {
-                    fileInfo = request.getFirstChild( "info" ).boolValue();
+                    fileInfo = request.getFirstChild( "info" ).safeBoolValue();
                 }
 		final String regex;
 		if ( request.hasChildren( "regex" ) ) {
-			regex = request.getFirstChild( "regex" ).strValue();
+			regex = request.getFirstChild( "regex" ).safeStrValue();
 		} else {
 			regex = ".*";
 		}
 
 		boolean dirsOnly;
 		if ( request.hasChildren( "dirsOnly" ) ) {
-			dirsOnly = request.getFirstChild( "dirsOnly" ).boolValue();
+			dirsOnly = request.getFirstChild( "dirsOnly" ).safeBoolValue();
 		} else {
 			dirsOnly = false;
 		}
@@ -698,7 +698,7 @@ public class FileService extends JavaService
 		if ( request.hasChildren( "order" ) ) {
 			Value order = request.getFirstChild( "order" );
 			
-			if ( files != null && order.hasChildren( "byname" ) && order.getFirstChild( "byname" ).boolValue() ) {
+			if ( files != null && order.hasChildren( "byname" ) && order.getFirstChild( "byname" ).safeBoolValue() ) {
 				Arrays.sort( files );
 			}
 		}
@@ -727,7 +727,7 @@ public class FileService extends JavaService
 	@RequestResponse
 	public Value isDirectory( Value request )
 	{
-		File dir = new File( request.strValue() );
+		File dir = new File( request.safeStrValue() );
 		Value response = Value.create();
 		response.setValue( dir.isDirectory() );
 		return response;
@@ -768,7 +768,7 @@ public class FileService extends JavaService
 	public Value toAbsolutePath( Value request ) throws FaultException
 	{
 		Value response = Value.create();
-		String fileName = request.strValue();
+		String fileName = request.safeStrValue();
 
 		Path absolutePath = null;
 		
@@ -787,7 +787,7 @@ public class FileService extends JavaService
 	public Value getParentPath( Value request ) throws FaultException
 	{
 		Value response = Value.create();
-		String fileName = request.strValue();
+		String fileName = request.safeStrValue();
 
 		Path parent = null;
 

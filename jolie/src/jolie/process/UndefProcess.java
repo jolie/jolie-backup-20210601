@@ -22,6 +22,7 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.runtime.FaultException;
 import jolie.runtime.VariablePath;
 
 public class UndefProcess implements Process
@@ -38,7 +39,7 @@ public class UndefProcess implements Process
 		return new UndefProcess( (VariablePath)varPath.cloneExpression( reason ) );
 	}
 	
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() )
 			return;

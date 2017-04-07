@@ -236,7 +236,7 @@ public class SSLProtocol extends SequentialCommProtocol
 		if ( hasParameter( "ssl" ) ) {
 			Value sslParams = getParameterFirstValue( "ssl" );
 			if ( sslParams.hasChildren( parameterName ) ) {
-				return sslParams.getFirstChild( parameterName ).strValue();
+				return sslParams.getFirstChild( parameterName ).safeStrValue();
 			}
 		}
 		return defaultValue;
@@ -247,7 +247,7 @@ public class SSLProtocol extends SequentialCommProtocol
 		if ( hasParameter( "ssl" ) ) {
 			Value sslParams = getParameterFirstValue( "ssl" );
 			if ( sslParams.hasChildren( parameterName ) ) {
-				return sslParams.getFirstChild( parameterName ).intValue();
+				return sslParams.getFirstChild( parameterName ).safeIntValue();
 			}
 		}
 		return defaultValue;

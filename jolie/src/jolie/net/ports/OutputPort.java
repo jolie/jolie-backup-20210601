@@ -38,6 +38,7 @@ import jolie.process.NullProcess;
 import jolie.process.Process;
 import jolie.process.SequentialProcess;
 import jolie.runtime.AbstractIdentifiableObject;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 import jolie.runtime.VariablePathBuilder;
@@ -185,7 +186,12 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 	public void optimizeLocation()
 	{
 		if ( isConstant ) {
-			locationExpression = locationVariablePath.getValue();
+            try {
+                locationExpression = locationVariablePath.getValue();
+            } catch ( FaultException e ){
+                e.printStackTrace();
+            }
+			
 		}
 	}
 
@@ -204,14 +210,21 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 	public CommProtocol getProtocol()
 		throws IOException, URISyntaxException
 	{
-		String protocolId = protocolVariablePath.getValue().strValue();
+		String protocolId = "";
+        String location = "";
+        try {
+            protocolId = protocolVariablePath.getValue().safeStrValue();
+            location = locationExpression.evaluate().safeStrValue();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
 		if ( protocolId.isEmpty() ) {
 			throw new IOException( "Unspecified protocol for output port " + id() );
 		}
 		return interpreter.commCore().createOutputCommProtocol(
 			protocolId,
 			protocolVariablePath,
-			new URI( locationExpression.evaluate().strValue() )
+			new URI( location )
 		);
 	}
 
@@ -220,7 +233,12 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 		throws URISyntaxException, IOException
 	{
 		CommChannel ret;
-		Value loc = locationExpression.evaluate();
+		Value loc = null;
+        try {
+            loc = locationExpression.evaluate();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
 		if ( loc.isChannel() ) {
 			// It's a local channel
 			ret = loc.channelValue();
@@ -234,7 +252,12 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 				ret = interpreter.commCore().createCommChannel( uri, this );
 			} else {
 				// Try reusing an existing channel first
-				String protocol = protocolVariablePath.getValue().strValue();
+				String protocol = "";
+                try {
+                    protocol = protocolVariablePath.getValue().safeStrValue();
+                } catch ( FaultException e ){
+                    e.printStackTrace();
+                }
 				ret = interpreter.commCore().getPersistentChannel( uri, protocol );
 				if ( ret == null ) {
 					ret = interpreter.commCore().createCommChannel( uri, this );
@@ -261,7 +284,12 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 	public String getResourcePath()
 		throws URISyntaxException
 	{
-		Value location = locationExpression.evaluate();
+		Value location = null;
+        try {
+            location = locationExpression.evaluate();
+        } catch ( FaultException e ){
+            e.printStackTrace();
+        }
 		if ( location.isChannel() ) {
 			return "/";
 		}
@@ -274,7 +302,7 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 		if ( location.isChannel() ) {
 			return LazyLocalUriHolder.uri;
 		}
-		String s = location.strValue();
+		String s = location.safeStrValue();
 		URI ret;
 		synchronized( uriCache ) {
 			if ( (ret=uriCache.get( s )) == null ) {

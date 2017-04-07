@@ -23,6 +23,7 @@
 package jolie.runtime.expression;
 
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 
@@ -40,7 +41,7 @@ public class IsDefinedExpression implements Expression
 		return new IsDefinedExpression( path );
 	}
 	
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value v = path.getValueOrNull();
 		boolean def = false;

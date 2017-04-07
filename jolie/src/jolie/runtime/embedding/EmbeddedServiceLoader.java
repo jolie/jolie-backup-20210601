@@ -26,6 +26,7 @@ import jolie.Interpreter;
 import jolie.lang.Constants;
 import jolie.lang.parse.ast.Program;
 import jolie.net.CommChannel;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
 import jolie.runtime.expression.Expression;
@@ -101,7 +102,11 @@ public abstract class EmbeddedServiceLoader
 	{
 		if ( channelDest != null ) {
 			if ( channelDest instanceof VariablePath ) {
-				((VariablePath) channelDest).getValue().setValue( channel );
+                try {
+                    ( (VariablePath) channelDest).getValue().setValue( channel );
+                } catch ( FaultException e ){
+                    e.printStackTrace();
+                }
 			} else if ( channelDest instanceof Value ) {
 				((Value) channelDest).setValue( channel );
 			}

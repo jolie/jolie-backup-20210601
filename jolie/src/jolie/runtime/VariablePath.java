@@ -75,7 +75,7 @@ public class VariablePath implements Expression, Cloneable
 		return new VariablePath( clonedPath );
 	}
 
-	public final VariablePath containedSubPath( VariablePath otherVarPath )
+	public final VariablePath containedSubPath( VariablePath otherVarPath ) throws FaultException
 	{
 		if ( getRootValue() != otherVarPath.getRootValue() )
 			return null;
@@ -92,15 +92,15 @@ public class VariablePath implements Expression, Cloneable
 			otherPair = otherVarPath.path[i];
 			
 			// *.element_name is not a subpath of *.other_name
-			if ( !pair.key().evaluate().strValue().equals( otherPair.key().evaluate().strValue() ) )
+			if ( !pair.key().evaluate().safeStrValue().equals( otherPair.key().evaluate().safeStrValue() ) )
 				return null;
 			
 			// If element name is equal, check for the same index
 			expr = pair.value();
 			otherExpr = otherPair.value();
 			
-			myIndex = ( expr == null ) ? 0 : expr.evaluate().intValue();
-			otherIndex = ( otherExpr == null ) ? 0 : otherExpr.evaluate().intValue();
+			myIndex = ( expr == null ) ? 0 : expr.evaluate().safeIntValue();
+			otherIndex = ( otherExpr == null ) ? 0 : otherExpr.evaluate().safeIntValue();
 			if ( myIndex != otherIndex )
 				return null;
 		}
@@ -131,7 +131,7 @@ public class VariablePath implements Expression, Cloneable
 		return ExecutionThread.currentThread().state().root();
 	}
 	
-	public final void undef()
+	public final void undef() throws FaultException
 	{
 		Pair< Expression, Expression > pair = null;
 		ValueVector currVector = null;
@@ -141,7 +141,7 @@ public class VariablePath implements Expression, Cloneable
 
 		for( int i = 0; i < path.length; i++ ) {
 			pair = path[i];
-			keyStr = pair.key().evaluate().strValue();
+			keyStr = pair.key().evaluate().safeStrValue();
 			currVector = currValue.children().get( keyStr );
 			if ( currVector == null ) {
 				return;
@@ -158,7 +158,7 @@ public class VariablePath implements Expression, Cloneable
 					currValue.children().remove( keyStr );
 				}
 			} else {
-				index = pair.value().evaluate().intValue();
+				index = pair.value().evaluate().safeIntValue();
 				if ( (i+1) < path.length ) {
 					if ( currVector.size() <= index ) {
 						return;
@@ -173,25 +173,25 @@ public class VariablePath implements Expression, Cloneable
 		}
 	}
 	
-	public final Value getValue()
+	public final Value getValue() throws FaultException
 	{
 		return getValue( getRootValue() );
 	}
 
-	public final Value getValue( Value currValue )
+	public final Value getValue( Value currValue ) throws FaultException
 	{
 		for( Pair< Expression, Expression > pair : path ) {
-			final String keyStr = pair.key().evaluate().strValue();
+			final String keyStr = pair.key().evaluate().safeStrValue();
 			currValue =
 				pair.value() == null
 				? currValue.getFirstChild( keyStr )
-				: currValue.getChildren( keyStr ).get( pair.value().evaluate().intValue() );
+				: currValue.getChildren( keyStr ).get( pair.value().evaluate().safeIntValue() );
 		}
 
 		return currValue;
 	}
 
-	public final void setValue( Value value )
+	public final void setValue( Value value ) throws FaultException
 	{
 		Pair< Expression, Expression > pair;
 		ValueVector currVector;
@@ -204,7 +204,7 @@ public class VariablePath implements Expression, Cloneable
 		} else {
 			for( int i = 0; i < path.length; i++ ) {
 				pair = path[i];
-				keyStr = pair.key().evaluate().strValue();
+				keyStr = pair.key().evaluate().safeStrValue();
 				currVector = currValue.getChildren( keyStr );
 				if ( pair.value() == null ) {
 					if ( (i+1) < path.length ) {
@@ -217,7 +217,7 @@ public class VariablePath implements Expression, Cloneable
 						}
 					}
 				} else {
-					index = pair.value().evaluate().intValue();
+					index = pair.value().evaluate().safeIntValue();
 					if ( (i+1) < path.length ) {
 						currValue = currVector.get( index );
 					} else {
@@ -232,16 +232,16 @@ public class VariablePath implements Expression, Cloneable
 		}
 	}
 
-	public final Value getValueOrNull()
+	public final Value getValueOrNull() throws FaultException
 	{
 		return getValueOrNull( getRootValue() );
 	}
 	
-	public final Value getValueOrNull( Value currValue )
+	public final Value getValueOrNull( Value currValue ) throws FaultException
 	{
 		for( int i = 0; i < path.length; i++ ) {
 			final Pair< Expression, Expression > pair = path[i];
-			final ValueVector currVector = currValue.children().get( pair.key().evaluate().strValue() );
+			final ValueVector currVector = currValue.children().get( pair.key().evaluate().safeStrValue() );
 			if ( currVector == null ) {
 				return null;
 			}
@@ -259,7 +259,7 @@ public class VariablePath implements Expression, Cloneable
 					}
 				}
 			} else {
-				final int index = pair.value().evaluate().intValue();
+				final int index = pair.value().evaluate().safeIntValue();
 				if ( currVector.size() <= index ) {
 					return null;
 				}
@@ -273,29 +273,29 @@ public class VariablePath implements Expression, Cloneable
 		return currValue;
 	}
 	
-	public final ValueVector getValueVector( Value currValue )
+	public final ValueVector getValueVector( Value currValue ) throws FaultException
 	{
 		ValueVector currVector = null;
 		for( int i = 0; i < path.length; i++ ) {
 			final Pair< Expression, Expression > pair = path[i];
-			currVector = currValue.getChildren( pair.key().evaluate().strValue() );
+			currVector = currValue.getChildren( pair.key().evaluate().safeStrValue() );
 			if ( (i+1) < path.length ) {
 				if ( pair.value() == null ) {
 					currValue = currVector.get( 0 );
 				} else {
-					currValue = currVector.get( pair.value().evaluate().intValue() );
+					currValue = currVector.get( pair.value().evaluate().safeIntValue() );
 				}
 			}
 		}
 		return currVector;
 	}
 	
-	public final ValueVector getValueVectorOrNull( Value currValue )
+	public final ValueVector getValueVectorOrNull( Value currValue ) throws FaultException
 	{
 		ValueVector currVector = null;
 		for( int i = 0; i < path.length; i++ ) {
 			final Pair< Expression, Expression > pair = path[i];
-			currVector = currValue.children().get( pair.key().evaluate().strValue() );
+			currVector = currValue.children().get( pair.key().evaluate().safeStrValue() );
 			if ( currVector == null ) {
 				return null;
 			}
@@ -306,7 +306,7 @@ public class VariablePath implements Expression, Cloneable
 					}
 					currValue = currVector.get( 0 );
 				} else {
-					final int index = pair.value().evaluate().intValue();
+					final int index = pair.value().evaluate().safeIntValue();
 					if ( currVector.size() <= index ) {
 						return null;
 					}
@@ -317,17 +317,17 @@ public class VariablePath implements Expression, Cloneable
 		return currVector;
 	}
 	
-	public final ValueVector getValueVectorOrNull()
+	public final ValueVector getValueVectorOrNull() throws FaultException
 	{
 		return getValueVectorOrNull( getRootValue() );
 	}
 	
-	public final ValueVector getValueVector()
+	public final ValueVector getValueVector() throws FaultException
 	{
 		return getValueVector( getRootValue() );
 	}
 	
-	public final void makePointer( VariablePath rightPath )
+	public final void makePointer( VariablePath rightPath ) throws FaultException
 	{
 		Pair< Expression, Expression > pair;
 		ValueVector currVector;
@@ -337,7 +337,7 @@ public class VariablePath implements Expression, Cloneable
 
 		for( int i = 0; i < path.length; i++ ) {
 			pair = path[i];
-			keyStr = pair.key().evaluate().strValue();
+			keyStr = pair.key().evaluate().safeStrValue();
 			currVector = currValue.getChildren( keyStr );
 			if ( pair.value() == null ) {
 				if ( (i+1) < path.length ) {
@@ -346,7 +346,7 @@ public class VariablePath implements Expression, Cloneable
 					currValue.children().put( keyStr, ValueVector.createLink( rightPath ) );
 				}
 			} else {
-				index = pair.value().evaluate().intValue();
+				index = pair.value().evaluate().safeIntValue();
 				if ( (i+1) < path.length ) {
 					currValue = currVector.get( index );
 				} else {
@@ -356,7 +356,7 @@ public class VariablePath implements Expression, Cloneable
 		}
 	}
 	
-	private Object getValueOrValueVector()
+	private Object getValueOrValueVector() throws FaultException
 	{	
 		Pair< Expression, Expression > pair;
 		ValueVector currVector;
@@ -365,7 +365,7 @@ public class VariablePath implements Expression, Cloneable
 
 		for( int i = 0; i < path.length; i++ ) {
 			pair = path[i];
-			currVector = currValue.getChildren( pair.key().evaluate().strValue() );
+			currVector = currValue.getChildren( pair.key().evaluate().safeStrValue() );
 			if ( pair.value() == null ) {
 				if ( (i+1) < path.length ) {
 					currValue = currVector.get( 0 );
@@ -373,7 +373,7 @@ public class VariablePath implements Expression, Cloneable
 					return currVector;
 				}
 			} else {
-				index = pair.value().evaluate().intValue();
+				index = pair.value().evaluate().safeIntValue();
 				if ( (i+1) < path.length ) {
 					currValue = currVector.get( index );
 				} else {
@@ -386,7 +386,7 @@ public class VariablePath implements Expression, Cloneable
 	}
 	
 	@SuppressWarnings("unchecked")
-	public final void deepCopy( VariablePath rightPath )
+	public final void deepCopy( VariablePath rightPath ) throws FaultException
 	{
 		Object myObj = getValueOrValueVector();
 		if ( myObj instanceof Value ) {
@@ -400,7 +400,7 @@ public class VariablePath implements Expression, Cloneable
 		}
 	}
 	
-	public final Value evaluate()
+	public final Value evaluate() throws FaultException
 	{
 		final Value v = getValueOrNull();
 		return ( v == null ) ? Value.UNDEFINED_VALUE : v;

@@ -180,7 +180,7 @@ public class XmlUtils
 	private static void _valueToDocument( Value value, Element element, Document doc, XSType type )
 	{
 		if ( type.isSimpleType() ) {
-			element.appendChild( doc.createTextNode( value.strValue() ) );
+			element.appendChild( doc.createTextNode( value.safeStrValue() ) );
 		} else if ( type.isComplexType() ) {
 			String name;
 			Value currValue;
@@ -191,14 +191,14 @@ public class XmlUtils
 			for( XSAttributeUse attrUse : attributeUses ) {
 				name = attrUse.getDecl().getName();
 				if ( (currValue=getAttributeOrNull( value, name )) != null ) {
-					element.setAttribute( name, currValue.strValue() );
+					element.setAttribute( name, currValue.safeStrValue() );
 				}
 			}
 
 			XSContentType contentType = complexType.getContentType();
 			XSParticle particle = contentType.asParticle();
 			if ( contentType.asSimpleType() != null ) {
-				element.appendChild( doc.createTextNode( value.strValue() ) );
+				element.appendChild( doc.createTextNode( value.safeStrValue() ) );
 			} else if ( particle != null ) {
 				XSTerm term = particle.getTerm();
 				XSModelGroupDecl modelGroupDecl;
@@ -220,13 +220,13 @@ public class XmlUtils
 			Element element,
 			Document doc
 	) {
-		element.appendChild( doc.createTextNode( value.strValue() ) );
+		element.appendChild( doc.createTextNode( value.safeStrValue() ) );
 		Map< String, ValueVector > attrs = getAttributesOrNull( value );
 		if ( attrs != null ) {
 			for( Entry< String, ValueVector > attrEntry : attrs.entrySet() ) {
 				element.setAttribute(
 					attrEntry.getKey(),
-					attrEntry.getValue().first().strValue()
+					attrEntry.getValue().first().safeStrValue()
 				);
 			}
 		}
@@ -254,19 +254,19 @@ public class XmlUtils
 	) {
 		// Supports only string, int, double and bool
 		if ( value.isString() ) {
-			element.appendChild( doc.createTextNode( value.strValue() ) );
+			element.appendChild( doc.createTextNode( value.safeStrValue() ) );
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "string" );
 		} else if ( value.isInt() ) {
-			element.appendChild( doc.createTextNode( Integer.toString( value.intValue() ) ) );
+			element.appendChild( doc.createTextNode( Integer.toString( value.safeIntValue() ) ) );
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "int" );
 		} else if ( value.isDouble() ) {
-			element.appendChild( doc.createTextNode( Double.toString( value.doubleValue() ) ) );
+			element.appendChild( doc.createTextNode( Double.toString( value.safeDoubleValue() ) ) );
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "double" );
 		} else if ( value.isLong() ) {
-			element.appendChild( doc.createTextNode( Long.toString( value.longValue() ) ) );
+			element.appendChild( doc.createTextNode( Long.toString( value.safeLongValue() ) ) );
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "long" );
 		} else if ( value.isBool() ) {
-			element.appendChild( doc.createTextNode( Boolean.toString( value.boolValue() ) ) );
+			element.appendChild( doc.createTextNode( Boolean.toString( value.safeBoolValue() ) ) );
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "bool" );
 		} else {
 			element.setAttribute( JOLIE_TYPE_ATTRIBUTE, "void" );
@@ -278,7 +278,7 @@ public class XmlUtils
 			for( Entry<String, ValueVector> attrEntry : attrs.entrySet() ) {
 				element.setAttribute(
 					attrEntry.getKey(),
-					attrEntry.getValue().first().strValue() );
+					attrEntry.getValue().first().safeStrValue() );
 			}
 		}
 

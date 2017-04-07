@@ -33,13 +33,13 @@ public class SemaphoreUtils extends JavaService {
 	private final HashMap< String, Semaphore > semaphores = new HashMap<String, Semaphore>();
 	
 	private String getSemaphoreName( Value v ){
-		return v.getFirstChild( "name" ).strValue();
+		return v.getFirstChild( "name" ).safeStrValue();
 	}
 	
 	private int getPermits( Value v ){
 		if( v.getFirstChild( "permits" ) != null && 
-			v.getFirstChild( "permits" ).intValue() != 0 ){
-			return v.getFirstChild( "permits" ).intValue();
+			v.getFirstChild( "permits" ).safeIntValue() != 0 ){
+			return v.getFirstChild( "permits" ).safeIntValue();
 		} else {
 			return 1;
 		}

@@ -30,6 +30,7 @@ import jolie.Interpreter;
 import jolie.SessionThread;
 import jolie.process.Process;
 import jolie.process.SpawnProcess;
+import jolie.runtime.typing.TypeCastingException;
 
 public class SpawnExecution
 {
@@ -52,9 +53,9 @@ public class SpawnExecution
 
 		@Override
 		public void runProcess()
-		{
-			parentSpawnProcess.indexPath().getValue().setValue( index );
+		{   
 			try {
+                parentSpawnProcess.indexPath().getValue().setValue( index );
 				process().run();
 			} catch( FaultException f ) {}
 			catch( ExitingException e ) {}
@@ -80,7 +81,10 @@ public class SpawnExecution
 		if ( parentSpawnProcess.inPath() != null ) {
 			parentSpawnProcess.inPath().undef();
 		}
-		int upperBound = parentSpawnProcess.upperBound().evaluate().intValue();
+        int upperBound = 0;
+        try {
+            upperBound = parentSpawnProcess.upperBound().evaluate().intValue();
+        } catch ( TypeCastingException e ) { }
 		latch = new CountDownLatch( upperBound );
 		SpawnedThread thread;
 		
@@ -110,8 +114,12 @@ public class SpawnExecution
 	{
 		synchronized( this ) {
 			if ( parentSpawnProcess.inPath() != null ) {
-				parentSpawnProcess.inPath().getValueVector( ethread.state().root() ).get( thread.index )
+                try {
+                    parentSpawnProcess.inPath().getValueVector( ethread.state().root() ).get( thread.index )
 					.deepCopy( parentSpawnProcess.inPath().getValueVector().first() );
+                } catch ( FaultException e ){
+                    e.printStackTrace();
+                }
 			}
 			
 			latch.countDown();

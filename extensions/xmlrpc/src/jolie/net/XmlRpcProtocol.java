@@ -247,25 +247,25 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 		if ( value.isInt() ) {
 
 			Element i = doc.createElement( "int" );
-			i.appendChild( doc.createTextNode( value.strValue() ) );
+			i.appendChild( doc.createTextNode( value.safeStrValue() ) );
 			v.appendChild( i );
 			node.appendChild( v );
 		} else if ( value.isString() ) {
 
 			Element s = doc.createElement( "string" );
-			s.appendChild( doc.createTextNode( value.strValue() ) );
+			s.appendChild( doc.createTextNode( value.safeStrValue() ) );
 			v.appendChild( s );
 			node.appendChild( v );
 		} else if ( value.isDouble() ) {
 
 			Element d = doc.createElement( "double" );
-			d.appendChild( doc.createTextNode( value.strValue() ) );
+			d.appendChild( doc.createTextNode( value.safeStrValue() ) );
 			v.appendChild( d );
 			node.appendChild( v );
 		} else if ( value.isBool() ) {
 		
 			Element b = doc.createElement( "boolean" );
-			b.appendChild( doc.createTextNode( value.boolValue() ? "1" : "0" ) );
+			b.appendChild( doc.createTextNode( value.safeBoolValue() ? "1" : "0" ) );
 			v.appendChild( b );
 			node.appendChild( v );
 		} else if ( value.isByteArray() ) {
@@ -325,7 +325,7 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 			Value aliases = getParameterFirstValue( "aliases" );
 			String alias;
 			if ( aliases.hasChildren( message.operationName() ) ) {
-				alias = aliases.getFirstChild( message.operationName() ).strValue();
+				alias = aliases.getFirstChild( message.operationName() ).safeStrValue();
 			} else {
 				alias = message.operationName();
 			}
@@ -351,7 +351,7 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 			i1.setTextContent( "0" ); // Jolie generates always zero code faults
 			n2.setTextContent( "faultString" );
 			// the XML-RPC specification allows us only to set this value
-			i2.setTextContent( f.value().strValue() );
+			i2.setTextContent( f.value().safeStrValue() );
 			v1.appendChild( i1 );
 			v2.appendChild( i2 );
 			m1.appendChild( n1 );
@@ -417,7 +417,7 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 			}
 		}
 
-		if ( getParameterVector( "keepAlive" ).first().intValue() != 1 ) {
+		if ( getParameterVector( "keepAlive" ).first().safeIntValue() != 1 ) {
 			channel().setToBeClosed( true );
 			httpMessage.append( "Connection: close" + HttpUtils.CRLF );
 		}
@@ -429,7 +429,7 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 		httpMessage.append( "Content-Type: text/xml; charset=utf-8" + HttpUtils.CRLF );
 		httpMessage.append( "Content-Length: " + content.size() + HttpUtils.CRLF + HttpUtils.CRLF );
 
-		if ( getParameterVector( "debug" ).first().intValue() > 0 ) {
+		if ( getParameterVector( "debug" ).first().safeIntValue() > 0 ) {
 			interpreter.logInfo( "[XMLRPC debug] Sending:\n" + httpMessage.toString() + content.toString( "utf-8" ) );
 		}
 
@@ -466,7 +466,7 @@ public class XmlRpcProtocol extends SequentialCommProtocol implements HttpUtils.
 		encoding = message.getProperty( "accept-encoding" );
 
 		if ( message.size() > 0 ) {
-			if ( getParameterVector( "debug" ).first().intValue() > 0 ) {
+			if ( getParameterVector( "debug" ).first().safeIntValue() > 0 ) {
 				interpreter.logInfo( "[XMLRPC debug] Receiving:\n" + new String( message.content(), charset ) );
 			}
 

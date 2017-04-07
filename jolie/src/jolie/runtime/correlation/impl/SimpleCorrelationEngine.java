@@ -100,20 +100,25 @@ public class SimpleCorrelationEngine extends CorrelationEngine
 		}
 		final List< CorrelationPair > pairs = cset.getOperationCorrelationPairs( message.operationName() );
 		for( CorrelationPair cpair : pairs ) {
-			final Value sessionValue = cpair.sessionPath().getValueOrNull( session.state().root() );
-			if ( sessionValue == null ) {
-				return false;
-			} else {
-				Value messageValue = cpair.messagePath().getValueOrNull( message.value() );
-				if ( messageValue == null ) {
-					return false;
-				} else {
-					// TODO: Value.equals is type insensitive, fix this with an additional check.
-					if ( !sessionValue.isDefined() || !messageValue.isDefined() || !sessionValue.equals( messageValue ) ) {
-						return false;
-					}
-				}
-			}
+            try {
+                final Value sessionValue = cpair.sessionPath().getValueOrNull( session.state().root() );
+                if ( sessionValue == null ) {
+                    return false;
+                } else {
+                    Value messageValue = cpair.messagePath().getValueOrNull( message.value() );
+                    if ( messageValue == null ) {
+                        return false;
+                    } else {
+                        // TODO: Value.equals is type insensitive, fix this with an additional check.
+                        if ( !sessionValue.isDefined() || !messageValue.isDefined() || !sessionValue.equals( messageValue ) ) {
+                            return false;
+                        }
+                    }
+                }
+            } catch ( FaultException e ){
+                e.printStackTrace();
+            }
+
 		}
 
 		return true;

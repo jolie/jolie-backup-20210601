@@ -66,19 +66,19 @@ public class NamedStatementParser
 			v = parameters.getFirstChild( entry.getKey() );
 			if ( v.isInt() ) {
 				for( Integer index : entry.getValue() ) {
-					statement.setInt( index, v.intValue() );
+					statement.setInt( index, v.safeIntValue() );
 				}
 			} else if ( v.isDouble() ) {
 				for( Integer index : entry.getValue() ) {
-					statement.setDouble( index, v.doubleValue() );
+					statement.setDouble( index, v.safeDoubleValue() );
 				}
 			} else if ( v.isLong() ) {
 				for( Integer index : entry.getValue() ) {
-					statement.setLong( index, v.longValue() );
+					statement.setLong( index, v.safeLongValue() );
 				}
 			} else if ( v.isBool() ) {
 				for( Integer index : entry.getValue() ) {
-					statement.setBoolean( index, v.boolValue() );
+					statement.setBoolean( index, v.safeBoolValue() );
 				}
 			} else if ( v.isByteArray() ) {
 				for( Integer index : entry.getValue() ) {
@@ -88,8 +88,8 @@ public class NamedStatementParser
 				if ( v.hasChildren( TypeKeywords.DATE ) ) {
 					Value date = v.getFirstChild( TypeKeywords.DATE );
 					for( Integer index : entry.getValue() ) {
-						String month = String.valueOf( date.getFirstChild( "month").intValue() );
-						String day = String.valueOf( date.getFirstChild( "day").intValue() );
+						String month = String.valueOf( date.getFirstChild( "month").safeIntValue() );
+						String day = String.valueOf( date.getFirstChild( "day").safeIntValue() );
 						if ( month.length() < 2 ) {
 							month = "0" + month;
 						}
@@ -98,7 +98,7 @@ public class NamedStatementParser
 						}
 						statement.setDate( index,
 							Date.valueOf(
-								date.getFirstChild( "year").intValue()
+								date.getFirstChild( "year").safeIntValue()
 								+ "-" + month
 								+ "-" +day
 							)
@@ -107,9 +107,9 @@ public class NamedStatementParser
 				} else if ( v.hasChildren( TypeKeywords.TIME ) ) {
 					Value time = v.getFirstChild( TypeKeywords.TIME );
 					for( Integer index : entry.getValue() ) {
-						String hour = String.valueOf( time.getFirstChild( "hour" ).intValue() );
-						String minute = String.valueOf( time.getFirstChild( "minute" ).intValue() );
-						String second = String.valueOf( time.getFirstChild( "second" ).intValue() );
+						String hour = String.valueOf( time.getFirstChild( "hour" ).safeIntValue() );
+						String minute = String.valueOf( time.getFirstChild( "minute" ).safeIntValue() );
+						String second = String.valueOf( time.getFirstChild( "second" ).safeIntValue() );
 						if ( hour.length() < 2 ) {
 							hour = "0" + hour;
 						}
@@ -120,13 +120,13 @@ public class NamedStatementParser
 					}
 				} else if ( v.hasChildren( TypeKeywords.TIMESTAMP ) ) {
 					Value timestampValue = v.getFirstChild( TypeKeywords.TIMESTAMP );					
-					Timestamp timestamp = new Timestamp( timestampValue.getFirstChild( "epoch" ).longValue()  );
+					Timestamp timestamp = new Timestamp( timestampValue.getFirstChild( "epoch" ).safeLongValue()  );
 					for( Integer index : entry.getValue() ) {
 						statement.setTimestamp( index, timestamp );
 					}
 				} else {
 					for( Integer index : entry.getValue() ) {
-						statement.setString( index, v.strValue() );
+						statement.setString( index, v.safeStrValue() );
 					}
 				}
 			}

@@ -73,13 +73,13 @@ public class SMTPService extends JavaService
 		 */
 		Authenticator authenticator = null;
 		Properties props = new Properties();
-		props.put( "mail.smtp.host", request.getFirstChild( "host" ).strValue() );
+		props.put( "mail.smtp.host", request.getFirstChild( "host" ).safeStrValue() );
 		if ( request.hasChildren( "authenticate" ) ) {
 			Value auth = request.getFirstChild( "authenticate" );
 			props.put( "mail.smtp.auth", "true" );
 			authenticator = new SimpleAuthenticator(
-				auth.getFirstChild( "username" ).strValue(),
-				auth.getFirstChild( "password" ).strValue()
+				auth.getFirstChild( "username" ).safeStrValue(),
+				auth.getFirstChild( "password" ).safeStrValue()
 			);
 		}
 		Session session = Session.getDefaultInstance( props, authenticator );
@@ -89,29 +89,29 @@ public class SMTPService extends JavaService
 			/*
 			 * Recipents (To, Cc, Bcc)
 			 */
-			msg.setFrom( new InternetAddress( request.getFirstChild( "from" ).strValue() ) );
+			msg.setFrom( new InternetAddress( request.getFirstChild( "from" ).safeStrValue() ) );
 			for( Value v : request.getChildren( "to" ) ) {
-				msg.addRecipient( Message.RecipientType.TO, new InternetAddress( v.strValue() ) );
+				msg.addRecipient( Message.RecipientType.TO, new InternetAddress( v.safeStrValue() ) );
 			}
 			for( Value v : request.getChildren( "cc" ) ) {
-				msg.addRecipient( Message.RecipientType.CC, new InternetAddress( v.strValue() ) );
+				msg.addRecipient( Message.RecipientType.CC, new InternetAddress( v.safeStrValue() ) );
 			}
 			for( Value v : request.getChildren( "bcc" ) ) {
-				msg.addRecipient( Message.RecipientType.BCC, new InternetAddress( v.strValue() ) );
+				msg.addRecipient( Message.RecipientType.BCC, new InternetAddress( v.safeStrValue() ) );
 			}
 
 			/*
 			 * Subject
 			 */
-			msg.setSubject( request.getFirstChild( "subject" ).strValue() );
+			msg.setSubject( request.getFirstChild( "subject" ).safeStrValue() );
 
 			/*
 			 * Content
 			 */
-			final String contentText = request.getFirstChild( "content" ).strValue();
+			final String contentText = request.getFirstChild( "content" ).safeStrValue();
 			String type = "text/plain";
 			if ( request.hasChildren( "contentType" ) ) {
-				type = request.getFirstChild( "contentType" ).strValue();
+				type = request.getFirstChild( "contentType" ).safeStrValue();
 			}
 			final String contentType = type;
 			DataHandler dh = new DataHandler( new DataSource()
@@ -147,7 +147,7 @@ public class SMTPService extends JavaService
 			int nAddr = replyTo.size();
 			Address[] replyAddr = new Address[ nAddr ];
 			for( int i = 0; i < nAddr; i++ ) {
-				replyAddr[ i ] = new InternetAddress( replyTo.get( i ).strValue() );
+				replyAddr[ i ] = new InternetAddress( replyTo.get( i ).safeStrValue() );
 			}
 			msg.setReplyTo( replyAddr );
 

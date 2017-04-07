@@ -25,7 +25,9 @@ package jolie.runtime.expression;
 
 import jolie.lang.Constants;
 import jolie.process.TransformationReason;
+import jolie.runtime.FaultException;
 import jolie.runtime.Value;
+import jolie.runtime.typing.TypeCastingException;
 
 public final class SumExpression implements Expression
 {
@@ -49,16 +51,23 @@ public final class SumExpression implements Expression
 	}
 	
 	@Override
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		final Value val = Value.create( children[0].expression().evaluate() );
-		for( int i = 1; i < children.length; i++ ) {
-			if ( children[i].type() == Constants.OperandType.ADD ) {
-				val.add( children[i].expression().evaluate() );
-			} else {
-				val.subtract( children[i].expression().evaluate() );
-			}
-		}
+		try {
+            for( int i = 1; i < children.length; i++ ) {
+                if ( children[i].type() == Constants.OperandType.ADD ) {
+                    val.add( children[i].expression().evaluate() );
+                } else {
+                    val.subtract( children[i].expression().evaluate() );
+                }
+            }
+        } catch ( TypeCastingException e ){
+            throw new FaultException( 
+              TYPE_CASTING_EXCEPTION, 
+              "Could to cast expression to a computable value" );
+        }
+
 		
 		return val;
 	}

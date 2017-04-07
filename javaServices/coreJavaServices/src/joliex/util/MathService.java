@@ -48,13 +48,15 @@ public class MathService extends JavaService
 
 	public Double pow( Value request )
 	{
-		return Math.pow( request.getFirstChild( "base" ).doubleValue(), request.getFirstChild( "exponent" ).doubleValue() );
+		return Math.pow( 
+          request.getFirstChild( "base" ).safeDoubleValue(), 
+          request.getFirstChild( "exponent" ).safeDoubleValue() );
 	}
 
 	public Integer summation( Value request )
 	{
-		int from = request.getFirstChild( "from" ).intValue();
-		int to = request.getFirstChild( "to" ).intValue();
+		int from = request.getFirstChild( "from" ).safeIntValue();
+		int to = request.getFirstChild( "to" ).safeIntValue();
 		int result = 0;
 		while( from <= to ) {
 			result += from;
@@ -73,9 +75,9 @@ public class MathService extends JavaService
 	{
 		int decimals = 0;
 		if ( v.hasChildren( "decimals" ) ) {
-			decimals = v.getFirstChild( "decimals" ).intValue();
+			decimals = v.getFirstChild( "decimals" ).safeIntValue();
 		}
-		double orig = v.doubleValue();
+		double orig = v.safeDoubleValue();
 		double power = Math.pow( 10, decimals );
 		double ret = orig * power;
 		if ( ret == Double.POSITIVE_INFINITY ) {

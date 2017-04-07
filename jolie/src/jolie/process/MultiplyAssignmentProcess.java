@@ -22,9 +22,12 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
+import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.Value;
 import jolie.runtime.VariablePath;
+import jolie.runtime.typing.TypeCastingException;
 
 /**
  * Multiply a VariablePath's value with an expression value, assigning the resulting
@@ -64,18 +67,34 @@ public class MultiplyAssignmentProcess implements Process, Expression
 	}
 
 	/** Evaluates the expression and adds its value to the variable's value. */
-	public void run()
+	public void run() throws FaultException
 	{
 		if ( ExecutionThread.currentThread().isKilled() ) {
 			return;
 		}
-		varPath.getValue().multiply( expression.evaluate() );
+        try {
+            varPath.getValue().multiply( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not multiply a non-numberic value"
+            );
+        }
+		
 	}
 
-	public Value evaluate()
+	public Value evaluate() throws FaultException
 	{
 		Value val = varPath.getValue();
-		val.multiply( expression.evaluate() );
+        try {
+            val.multiply( expression.evaluate() );
+        } catch ( TypeCastingException e ){
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not multiply a non-numberic value"
+            );
+        }
+		
 		return val;
 	}
 

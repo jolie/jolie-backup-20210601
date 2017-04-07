@@ -61,9 +61,9 @@ public class JsUtils
 		if ( !value.isDefined() ) {
 			return "null";
 		} else if ( value.isInt() || value.isLong() || value.isBool() || value.isDouble() ) {
-			return value.strValue();
+			return value.safeStrValue();
 		} else {
-			return '"' + JSONValue.escape( value.strValue() ) + '"';
+			return '"' + JSONValue.escape( value.safeStrValue() ) + '"';
 		}
 	}
 
@@ -125,9 +125,9 @@ public class JsUtils
 	public static void faultValueToJsonString( Value value, Type type, StringBuilder builder ) throws IOException
 	{
 		builder.append( "{\"error\":{\"message\":\"" );
-		builder.append( value.getFirstChild( "error" ).getFirstChild( "message" ).strValue() );
+		builder.append( value.getFirstChild( "error" ).getFirstChild( "message" ).safeStrValue() );
 		builder.append( "\",\"code\":" );
-		builder.append( value.getFirstChild( "error" ).getFirstChild( "code" ).intValue() );
+		builder.append( value.getFirstChild( "error" ).getFirstChild( "code" ).safeIntValue() );
 		builder.append( ",\"data\":" );
 		valueToJsonString( value.getFirstChild( "error" ).getFirstChild( "data" ), false, type, builder );
 		builder.append( "}}" );
