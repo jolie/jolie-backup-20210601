@@ -72,7 +72,7 @@ public class NetworkService extends JavaService  {
 			while (list.hasMoreElements()) {
 				NetworkInterface n = list.nextElement();
 				
-				if ( n.getName().equals( request.getFirstChild("interfaceName").safeStrValue())) {
+				if ( n.getName().equals( request.getFirstChild("interfaceName").strValue())) {
 					found = true;
 		
 					Enumeration<InetAddress> ad = n.getInetAddresses();

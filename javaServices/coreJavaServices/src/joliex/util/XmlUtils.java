@@ -65,8 +65,8 @@ public class XmlUtils extends JavaService
 	{
 		try {
 			Document doc = documentBuilderFactory.newDocumentBuilder().newDocument();
-			String rootNodeName = request.getFirstChild( "rootNodeName" ).safeStrValue();
-			if ( request.getFirstChild( "plain" ).safeBoolValue() ) {
+			String rootNodeName = request.getFirstChild( "rootNodeName" ).strValue();
+			if ( request.getFirstChild( "plain" ).boolValue() ) {
 				jolie.xml.XmlUtils.valueToDocument(
 					request.getFirstChild( "root" ),
 					rootNodeName,
@@ -80,10 +80,10 @@ public class XmlUtils extends JavaService
 				);
 			}
 			Transformer t = transformerFactory.newTransformer();
-			if ( request.getFirstChild( "omitXmlDeclaration" ).safeBoolValue() ) {
+			if ( request.getFirstChild( "omitXmlDeclaration" ).boolValue() ) {
 				t.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
 			}
-			if ( request.getFirstChild( "indent" ).safeBoolValue() ) {
+			if ( request.getFirstChild( "indent" ).boolValue() ) {
 				t.setOutputProperty( OutputKeys.INDENT, "yes" );
 			} else {
 				t.setOutputProperty( OutputKeys.INDENT, "no" );
@@ -113,27 +113,27 @@ public class XmlUtils extends JavaService
 			if ( request.isByteArray() ) {
 				src = new InputSource( new ByteArrayInputStream( request.byteArrayValue().getBytes() ) );
 			} else {
-				src = new InputSource( new StringReader( request.safeStrValue() ) );
+				src = new InputSource( new StringReader( request.strValue() ) );
 			}
 
 			boolean includeAttributes = false;
 			if ( request.hasChildren( "options" ) ){
 				if ( request.getFirstChild( "options" ).hasChildren( "includeAttributes" ) ){
-					includeAttributes = request.getFirstChild( "options" ).getFirstChild( "includeAttributes" ).safeBoolValue();
+					includeAttributes = request.getFirstChild( "options" ).getFirstChild( "includeAttributes" ).boolValue();
 				}
 				if ( request.getFirstChild( "options" ).hasChildren( "schemaUrl" ) ){
 					SchemaFactory schemaFactory = SchemaFactory.newInstance(
 					  request.getFirstChild( "options" ).hasChildren( "schemaLanguage" )
-					    ? request.getFirstChild( "options" ).getFirstChild( "schemaLanguage" ).safeStrValue()
+					    ? request.getFirstChild( "options" ).getFirstChild( "schemaLanguage" ).strValue()
 					    : XMLConstants.W3C_XML_SCHEMA_NS_URI
 					);
 					Schema schema = schemaFactory.newSchema(new URL(
-					  request.getFirstChild( "options" ).getFirstChild( "schemaUrl" ).safeStrValue()
+					  request.getFirstChild( "options" ).getFirstChild( "schemaUrl" ).strValue()
 					));
 					documentBuilderFactory.setSchema(schema); // set schema
 				}
 				if ( request.getFirstChild( "options" ).hasChildren( "charset" ) ) {
-					src.setEncoding( request.getFirstChild( "options" ).getFirstChild( "charset" ).safeStrValue() );
+					src.setEncoding( request.getFirstChild( "options" ).getFirstChild( "charset" ).strValue() );
 				}
 			}
 
@@ -163,8 +163,8 @@ public class XmlUtils extends JavaService
 		throws FaultException
 	{
 		try {
-			StreamSource source = new StreamSource( new StringReader( request.getFirstChild( "source" ).safeStrValue() ) );
-			Transformer t = transformerFactory.newTransformer( new StreamSource( new StringReader( request.getFirstChild( "xslt" ).safeStrValue() ) ) );
+			StreamSource source = new StreamSource( new StringReader( request.getFirstChild( "source" ).strValue() ) );
+			Transformer t = transformerFactory.newTransformer( new StreamSource( new StringReader( request.getFirstChild( "xslt" ).strValue() ) ) );
 			StringWriter writer = new StringWriter();
 			StreamResult result = new StreamResult( writer );
 			t.transform( source, result );

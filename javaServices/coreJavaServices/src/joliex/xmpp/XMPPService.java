@@ -71,9 +71,9 @@ public class XMPPService extends JavaService
 	public void _sendMessage( Value request )
 		throws FaultException
 	{
-		Chat chat = getChat( request.getFirstChild( "to" ).safeStrValue() );
+		Chat chat = getChat( request.getFirstChild( "to" ).strValue() );
 		try {
-			chat.sendMessage( request.safeStrValue() );
+			chat.sendMessage( request.strValue() );
 		} catch( XMPPException e ) {
 			throw new FaultException( e );
 		}
@@ -89,16 +89,16 @@ public class XMPPService extends JavaService
 		
 		ConnectionConfiguration config;
 
-		int port = request.getFirstChild( "port" ).safeIntValue();
+		int port = request.getFirstChild( "port" ).intValue();
 		if ( request.hasChildren( "host" ) && port > 0 ) {
 			config = new ConnectionConfiguration(
-				request.getFirstChild( "host" ).safeStrValue(),
+				request.getFirstChild( "host" ).strValue(),
 				port,
-				request.getFirstChild( "serviceName" ).safeStrValue()
+				request.getFirstChild( "serviceName" ).strValue()
 			);
 		} else {
 			config = new ConnectionConfiguration(
-				request.getFirstChild( "serviceName" ).safeStrValue()
+				request.getFirstChild( "serviceName" ).strValue()
 			);
 		}
 
@@ -107,14 +107,14 @@ public class XMPPService extends JavaService
 			connection.connect();
 			if ( request.hasChildren( "resource" ) ) {
 				connection.login(
-					request.getFirstChild( "username" ).safeStrValue(),
-					request.getFirstChild( "password" ).safeStrValue(),
-					request.getFirstChild( "resource" ).safeStrValue()
+					request.getFirstChild( "username" ).strValue(),
+					request.getFirstChild( "password" ).strValue(),
+					request.getFirstChild( "resource" ).strValue()
 				);
 			} else {
 				connection.login(
-					request.getFirstChild( "username" ).safeStrValue(),
-					request.getFirstChild( "password" ).safeStrValue(),
+					request.getFirstChild( "username" ).strValue(),
+					request.getFirstChild( "password" ).strValue(),
 					"Jolie"
 				);
 			}

@@ -58,7 +58,7 @@ public final class ForProcess implements Process
 		}
 		
 		init.run();
-		while ( condition.evaluate().safeBoolValue() ) {
+		while ( condition.evaluate().boolValue() ) {
 			process.run();
 			if ( ethread.isKilled() )
 				return;

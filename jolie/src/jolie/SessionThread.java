@@ -206,50 +206,50 @@ public class SessionThread extends ExecutionThread
 	public static List< Pair< String, Process > > createDefaultFaultHandlers( final Interpreter interpreter )
 	{
 		final List< Pair< String, Process > > instList = new ArrayList<>();
-		instList.add( new Pair<>(
-			Constants.TYPE_MISMATCH_FAULT_NAME,
-			new Process() {
-				@Override
-				public void run() throws FaultException, ExitingException
-				{
-					interpreter.logInfo( typeMismatchPath.getValue().safeStrValue() );
-				}
-
-				@Override
-				public Process clone( TransformationReason reason )
-				{
-					return this;
-				}
-
-				@Override
-				public boolean isKillable()
-				{
-					return true;
-				}
-			}
-		) );
-		instList.add( new Pair<>(
-			Constants.IO_EXCEPTION_FAULT_NAME,
-			new Process() {
-				@Override
-				public void run() throws FaultException, ExitingException
-				{
-					interpreter.logInfo( ioExceptionPath.getValue().safeStrValue() );
-				}
-
-				@Override
-				public Process clone( TransformationReason reason )
-				{
-					return this;
-				}
-
-				@Override
-				public boolean isKillable()
-				{
-					return true;
-				}
-			}
-		) );
+//        instList.add( new Pair<>(
+//			Constants.TYPE_MISMATCH_FAULT_NAME,
+//			new Process() {
+//				@Override
+//				public void run() throws FaultException, ExitingException
+//				{
+//					interpreter.logInfo( typeMismatchPath.getValue().strValue() );
+//				}
+//
+//				@Override
+//				public Process clone( TransformationReason reason )
+//				{
+//					return this;
+//				}
+//
+//				@Override
+//				public boolean isKillable()
+//				{
+//					return true;
+//				}
+//			}
+//		) );
+//		instList.add( new Pair<>(
+//			Constants.IO_EXCEPTION_FAULT_NAME,
+//			new Process() {
+//				@Override
+//				public void run() throws FaultException, ExitingException
+//				{
+//					interpreter.logInfo( ioExceptionPath.getValue().strValue() );
+//				}
+//
+//				@Override
+//				public Process clone( TransformationReason reason )
+//				{
+//					return this;
+//				}
+//
+//				@Override
+//				public boolean isKillable()
+//				{
+//					return true;
+//				}
+//			}
+//		) );
 		return instList;
 	}
 
@@ -487,7 +487,7 @@ public class SessionThread extends ExecutionThread
 					} catch( ExitingException e ) {}
 				}
 			} catch( FaultException fault ) {
-				listeners.forEach( listener -> listener.onSessionError( this, fault ) );
+                listeners.forEach( listener -> listener.onSessionError( this, fault ) );
 			}
 
 			listeners.forEach( listener -> listener.onSessionExecuted( this ) );

@@ -135,7 +135,7 @@ public abstract class CommProtocol
 	 */
 	protected boolean checkBooleanParameter( String id )
 	{
-		return hasParameter( id ) && getParameterFirstValue( id ).safeBoolValue();
+		return hasParameter( id ) && getParameterFirstValue( id ).boolValue();
 	}
 
 	/**
@@ -145,7 +145,7 @@ public abstract class CommProtocol
 	protected boolean checkBooleanParameter( String id, boolean defaultValue )
 	{
 		if ( hasParameter( id ) ) {
-			return getParameterFirstValue( id ).safeBoolValue();
+			return getParameterFirstValue( id ).boolValue();
 		} else {
 			return defaultValue;
 		}
@@ -160,7 +160,7 @@ public abstract class CommProtocol
 	protected boolean checkStringParameter( String id, String value )
 	{
 		if ( hasParameter( id ) ) {
-			return getParameterFirstValue( id ).safeStrValue().equals( value );
+			return getParameterFirstValue( id ).strValue().equals( value );
 		} else {
 			return false;
 		}
@@ -177,7 +177,7 @@ public abstract class CommProtocol
 	
 	protected String getStringParameter( String id, String defaultValue )
 	{
-		return ( hasParameter( id ) ? getParameterFirstValue( id ).safeStrValue() : defaultValue );
+		return ( hasParameter( id ) ? getParameterFirstValue( id ).strValue() : defaultValue );
 	}
 
 	protected boolean hasOperationSpecificParameter( String operationName, String parameterName )
@@ -198,7 +198,7 @@ public abstract class CommProtocol
 			if ( osc.hasChildren( operationName ) ) {
 				Value opConfig = osc.getFirstChild( operationName );
 				if ( opConfig.hasChildren( parameterName ) ) {
-					return opConfig.getFirstChild( parameterName ).safeStrValue();
+					return opConfig.getFirstChild( parameterName ).strValue();
 				}
 			}
 		}
@@ -225,7 +225,7 @@ public abstract class CommProtocol
 	 */
 	protected int getIntParameter( String id )
 	{
-		return ( hasParameter( id ) ? getParameterFirstValue( id ).safeIntValue() : 0 );
+		return ( hasParameter( id ) ? getParameterFirstValue( id ).intValue() : 0 );
 	}
 	
 	abstract public CommMessage recv( InputStream istream, OutputStream ostream )

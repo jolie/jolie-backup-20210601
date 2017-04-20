@@ -95,7 +95,7 @@ public abstract class ExecutionThread extends JolieThread
 		 */
 		public void installFaultHandler( String faultName, Process process )
 		{
-			faultMap.put( faultName, process );
+            faultMap.put( faultName, process );
 		}
 
 		/**
@@ -109,15 +109,16 @@ public abstract class ExecutionThread extends JolieThread
 		public Process getFaultHandler( String faultName, boolean erase )
 		{
 			Process p = faultMap.get( faultName );
-			if ( erase ) { // Not called by cH (TODO: this is obscure!)
+            if ( erase ) { // Not called by cH (TODO: this is obscure!)
 				if ( p == null ) {
 					// Give the default handler
 					faultName = Constants.Keywords.DEFAULT_HANDLER_NAME;
 					p = faultMap.get( faultName );
-				}
-				if ( p != null ) {
+            	}
+//				if ( p != null ) {
+                else {
 					// Could still be null if there was not a default handler
-					faultMap.remove( faultName );
+			        faultMap.remove( faultName );
 				}
 			}
 				
@@ -406,7 +407,7 @@ public abstract class ExecutionThread extends JolieThread
 	public synchronized void installFaultHandler( String id, Process process )
 	{
 		if ( scopeStack.isEmpty() && parent != null ) {
-			parent.installFaultHandler( id, process );
+            parent.installFaultHandler( id, process );
 		} else {
 			scopeStack.peek().installFaultHandler( id, process );
 		}

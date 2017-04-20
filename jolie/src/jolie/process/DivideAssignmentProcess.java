@@ -75,12 +75,12 @@ public class DivideAssignmentProcess implements Process, Expression
         try {
             varPath.getValue().divide( expression.evaluate() );
         } catch ( TypeCastingException e ){
-            new FaultException(
+            throw new FaultException(
               Constants.CASTING_EXCEPTION_FAULT_NAME,
               "Could not divide non-numberic values"
             );
         } catch ( ArithmeticException e ){
-            new FaultException(
+            throw new FaultException(
               Constants.ARITHMETIC_EXCEPTION_FAULT_NAME,
               "Division by zero"
             );
@@ -93,12 +93,12 @@ public class DivideAssignmentProcess implements Process, Expression
 		try {
             val.divide( expression.evaluate() );
         } catch ( TypeCastingException e ){
-            new FaultException(
+            throw new FaultException(
               Constants.CASTING_EXCEPTION_FAULT_NAME,
               "Could not divide non-numberic values"
             );
         } catch ( ArithmeticException e ){
-            new FaultException(
+            throw new FaultException(
               Constants.ARITHMETIC_EXCEPTION_FAULT_NAME,
               "Division by zero"
             );

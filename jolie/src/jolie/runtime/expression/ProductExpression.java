@@ -21,6 +21,7 @@
 
 package jolie.runtime.expression;
 
+import jolie.lang.Constants;
 import jolie.process.TransformationReason;
 import jolie.runtime.FaultException;
 import jolie.runtime.Value;
@@ -65,9 +66,16 @@ public class ProductExpression implements Expression
                 }
             }
         } catch ( TypeCastingException e ){
-            throw new FaultException( 
-              TYPE_CASTING_EXCEPTION, 
-              "Could to cast expression to a computable value");
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                 "Could to cast expression to a computable value"
+            );
+        }
+        catch ( ArithmeticException e ){
+            throw new FaultException(
+              Constants.ARITHMETIC_EXCEPTION_FAULT_NAME,
+              "Division by zero"
+            );
         }
 		return val;
 	}

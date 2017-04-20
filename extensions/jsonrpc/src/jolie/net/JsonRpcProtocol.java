@@ -209,19 +209,19 @@ public class JsonRpcProtocol extends SequentialCommProtocol implements HttpUtils
 				if (!inInputPort) {
 					throw new IOException("A JSON-RPC notification (message without \"id\") needs to be a request, not a response!");
 				}
-				return new CommMessage(CommMessage.GENERIC_ID, value.getFirstChild("method").safeStrValue(),
+				return new CommMessage(CommMessage.GENERIC_ID, value.getFirstChild("method").strValue(),
 						    "/", value.getFirstChild("params"), null);
 			}
-			String jsonRpcId = value.getFirstChild("id").safeStrValue();
+			String jsonRpcId = value.getFirstChild("id").strValue();
 			if ( inInputPort ) {
 				jsonRpcIdMap.put((long)jsonRpcId.hashCode(), jsonRpcId);
-				return new CommMessage(jsonRpcId.hashCode(), value.getFirstChild("method").safeStrValue(),
+				return new CommMessage(jsonRpcId.hashCode(), value.getFirstChild("method").strValue(),
 						    "/", value.getFirstChild("params"), null);
 			} else if (value.hasChildren("error")) {
 				String operationName = jsonRpcOpMap.get(jsonRpcId);
 				return new CommMessage(Long.valueOf(jsonRpcId), operationName, "/", null,
 					new FaultException(
-						value.getFirstChild( "error" ).getFirstChild( "message" ).safeStrValue(),
+						value.getFirstChild( "error" ).getFirstChild( "message" ).strValue(),
 						value.getFirstChild( "error" ).getFirstChild( "data" )
 					)
 				);

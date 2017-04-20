@@ -99,7 +99,7 @@ public class RuntimeService extends JavaService
 	@RequestResponse
 	public void setOutputPort( Value request )
 	{
-		String name = request.getFirstChild( "name" ).safeStrValue();
+		String name = request.getFirstChild( "name" ).strValue();
 		Value locationValue = request.getFirstChild( "location" );
 		Value protocolValue = request.getFirstChild( "protocol" );
 		OutputPort port =
@@ -112,7 +112,7 @@ public class RuntimeService extends JavaService
 		if ( locationValue.isChannel() ) {
 			l.setValue( locationValue.channelValue() );
 		} else {
-			l.setValue( locationValue.safeStrValue() );
+			l.setValue( locationValue.strValue() );
 		}
 		r.getFirstChild( name ).getFirstChild( Constants.PROTOCOL_NODE_NAME ).refCopy( protocolValue );
 
@@ -121,7 +121,7 @@ public class RuntimeService extends JavaService
 		if ( locationValue.isChannel() ) {
 			l.setValue( locationValue.channelValue() );
 		} else {
-			l.setValue( locationValue.safeStrValue() );
+			l.setValue( locationValue.strValue() );
 		}
 		r.getFirstChild( name ).getFirstChild( Constants.PROTOCOL_NODE_NAME ).deepCopy( protocolValue );
 
@@ -134,7 +134,7 @@ public class RuntimeService extends JavaService
 		OutputPort foundOp = null;
 		Value ret = Value.create();
 		for ( OutputPort o : interpreter.outputPorts() ) {
-			if ( o.id().equals( v.getFirstChild( "name" ).safeStrValue() ) ) {
+			if ( o.id().equals( v.getFirstChild( "name" ).strValue() ) ) {
 				foundOp = o;
 			}
 		}
@@ -147,7 +147,7 @@ public class RuntimeService extends JavaService
 			} catch ( Exception e ) {
 				ret.getFirstChild( "protocol" ).setValue( "" );
 			}
-			ret.getFirstChild( "location" ).setValue( foundOp.locationVariablePath().getValue().safeStrValue() );
+			ret.getFirstChild( "location" ).setValue( foundOp.locationVariablePath().getValue().strValue() );
 		}
 		return ret;
 	}
@@ -165,7 +165,7 @@ public class RuntimeService extends JavaService
 				ret.getChildren( "port" ).get( counter ).getFirstChild( "protocol" ).setValue( "" );
 			}
             try {
-                ret.getChildren( "port" ).get( counter ).getFirstChild( "location" ).setValue( o.locationVariablePath().getValue().safeStrValue() );
+                ret.getChildren( "port" ).get( counter ).getFirstChild( "location" ).setValue( o.locationVariablePath().getValue().strValue() );
             } catch ( FaultException e ){
                 e.printStackTrace();
             }
@@ -191,15 +191,15 @@ public class RuntimeService extends JavaService
 	public void setRedirection( Value request )
 			throws FaultException
 	{
-		String serviceName = request.getChildren( "inputPortName" ).first().safeStrValue();
+		String serviceName = request.getChildren( "inputPortName" ).first().strValue();
 		CommListener listener =
 				interpreter.commCore().getListenerByInputPortName( serviceName );
 		if ( listener == null ) {
 			throw new FaultException( "RuntimeException", "Unknown inputPort: " + serviceName );
 		}
 
-		String resourceName = request.getChildren( "resourceName" ).first().safeStrValue();
-		String opName = request.getChildren( "outputPortName" ).first().safeStrValue();
+		String resourceName = request.getChildren( "resourceName" ).first().strValue();
+		String opName = request.getChildren( "outputPortName" ).first().strValue();
 		try {
 			OutputPort port = interpreter.getOutputPort( opName );
 			listener.inputPort().redirectionMap().put( resourceName, port );
@@ -212,14 +212,14 @@ public class RuntimeService extends JavaService
 	public void removeRedirection( Value request )
 			throws FaultException
 	{
-		String serviceName = request.getChildren( "inputPortName" ).first().safeStrValue();
+		String serviceName = request.getChildren( "inputPortName" ).first().strValue();
 		CommListener listener =
 				interpreter.commCore().getListenerByInputPortName( serviceName );
 		if ( listener == null ) {
 			throw new FaultException( "RuntimeException", "Unknown inputPort: " + serviceName );
 		}
 
-		String resourceName = request.getChildren( "resourceName" ).first().safeStrValue();
+		String resourceName = request.getChildren( "resourceName" ).first().strValue();
 		listener.inputPort().redirectionMap().remove( resourceName );
 	}
 
@@ -227,14 +227,14 @@ public class RuntimeService extends JavaService
 			throws FaultException
 	{
 		Value ret;
-		String inputPortName = request.getChildren( "inputPortName" ).first().safeStrValue();
+		String inputPortName = request.getChildren( "inputPortName" ).first().strValue();
 		CommListener listener =
 				interpreter.commCore().getListenerByInputPortName( inputPortName );
 		if ( listener == null ) {
 			throw new FaultException( "RuntimeException", Value.create( "Invalid input port: " + inputPortName ) );
 		}
 
-		String resourceName = request.getChildren( "resourceName" ).first().safeStrValue();
+		String resourceName = request.getChildren( "resourceName" ).first().strValue();
 		OutputPort p = listener.inputPort().redirectionMap().get( resourceName );
 		if ( p == null ) {
 			ret = Value.create();
@@ -259,8 +259,8 @@ public class RuntimeService extends JavaService
 	{
 		try {
 			Value channel = Value.create();
-			String filePath = request.getFirstChild( "filepath" ).safeStrValue();
-			String typeStr = request.getFirstChild( "type" ).safeStrValue();
+			String filePath = request.getFirstChild( "filepath" ).strValue();
+			String typeStr = request.getFirstChild( "type" ).strValue();
 			EmbeddedServiceType type =
 					jolie.lang.Constants.stringToEmbeddedServiceType( typeStr );
             EmbeddedServiceLoader.ExternalEmbeddedServiceConfiguration configuration =
@@ -317,7 +317,7 @@ public class RuntimeService extends JavaService
 		final String status_field = "status";
 		int status = 0;
 		if ( request.hasChildren( status_field ) ) {
-			status = request.getFirstChild( status_field ).safeIntValue();
+			status = request.getFirstChild( status_field ).intValue();
 		}
 		Runtime.getRuntime().halt( status );
 	}

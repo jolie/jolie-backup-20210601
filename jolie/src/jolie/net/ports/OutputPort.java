@@ -213,8 +213,8 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 		String protocolId = "";
         String location = "";
         try {
-            protocolId = protocolVariablePath.getValue().safeStrValue();
-            location = locationExpression.evaluate().safeStrValue();
+            protocolId = protocolVariablePath.getValue().strValue();
+            location = locationExpression.evaluate().strValue();
         } catch ( FaultException e ){
             e.printStackTrace();
         }
@@ -254,7 +254,7 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 				// Try reusing an existing channel first
 				String protocol = "";
                 try {
-                    protocol = protocolVariablePath.getValue().safeStrValue();
+                    protocol = protocolVariablePath.getValue().strValue();
                 } catch ( FaultException e ){
                     e.printStackTrace();
                 }
@@ -302,7 +302,7 @@ public class OutputPort extends AbstractIdentifiableObject implements Port
 		if ( location.isChannel() ) {
 			return LazyLocalUriHolder.uri;
 		}
-		String s = location.safeStrValue();
+		String s = location.strValue();
 		URI ret;
 		synchronized( uriCache ) {
 			if ( (ret=uriCache.get( s )) == null ) {

@@ -109,19 +109,19 @@ public class DatabaseService extends JavaService
 	{
 		close();
 
-		mustCheckConnection = request.getFirstChild( "checkConnection" ).safeIntValue() > 0;
+		mustCheckConnection = request.getFirstChild( "checkConnection" ).intValue() > 0;
 
-		toLowerCase = request.getFirstChild( "toLowerCase" ).isDefined() && request.getFirstChild( "toLowerCase" ).safeBoolValue();
+		toLowerCase = request.getFirstChild( "toLowerCase" ).isDefined() && request.getFirstChild( "toLowerCase" ).boolValue();
 
-		toUpperCase = request.getFirstChild( "toUpperCase" ).isDefined() && request.getFirstChild( "toUpperCase" ).safeBoolValue();
+		toUpperCase = request.getFirstChild( "toUpperCase" ).isDefined() && request.getFirstChild( "toUpperCase" ).boolValue();
 
-		driver = request.getChildren( "driver" ).first().safeStrValue();
-		String host = request.getChildren( "host" ).first().safeStrValue();
-		String port = request.getChildren( "port" ).first().safeStrValue();
-		String databaseName = request.getChildren( "database" ).first().safeStrValue();
-		username = request.getChildren( "username" ).first().safeStrValue();
-		password = request.getChildren( "password" ).first().safeStrValue();
-		String attributes = request.getFirstChild( "attributes" ).safeStrValue();
+		driver = request.getChildren( "driver" ).first().strValue();
+		String host = request.getChildren( "host" ).first().strValue();
+		String port = request.getChildren( "port" ).first().strValue();
+		String databaseName = request.getChildren( "database" ).first().strValue();
+		username = request.getChildren( "username" ).first().strValue();
+		password = request.getChildren( "password" ).first().strValue();
+		String attributes = request.getFirstChild( "attributes" ).strValue();
 		String separator = "/";
 		boolean isEmbedded = false;
 
@@ -261,7 +261,7 @@ public class DatabaseService extends JavaService
 		PreparedStatement stm = null;
 		try {
 			synchronized( transactionMutex ) {
-				stm = new NamedStatementParser( connection, request.safeStrValue(), request ).getPreparedStatement();
+				stm = new NamedStatementParser( connection, request.strValue(), request ).getPreparedStatement();
 				resultValue.setValue( stm.executeUpdate() );
 			}
 		} catch( SQLException e ) {
@@ -417,7 +417,7 @@ public class DatabaseService extends JavaService
 			templateNode = template.getFirstChild( child.getKey() );
 			resultChild = resultValue.getFirstChild( child.getKey() );
 			if ( templateNode.isString() ) {
-				colIndex = colIndexes.get( templateNode.safeStrValue() );
+				colIndex = colIndexes.get( templateNode.strValue() );
 				setValue( resultChild, result, metadata.getColumnType( colIndex ), colIndex );
 			}
 
@@ -468,7 +468,7 @@ public class DatabaseService extends JavaService
 				stm = null;
 				try {
 					updateCount = -1;
-					stm = new NamedStatementParser( connection, statementValue.safeStrValue(), statementValue ).getPreparedStatement();
+					stm = new NamedStatementParser( connection, statementValue.strValue(), statementValue ).getPreparedStatement();
 					if ( stm.execute() == true ) {
 						updateCount = stm.getUpdateCount();
 						if ( updateCount == -1 ) {
@@ -537,7 +537,7 @@ public class DatabaseService extends JavaService
 
 		try {
 			synchronized( transactionMutex ) {
-				stm = new NamedStatementParser( connection, request.safeStrValue(), request ).getPreparedStatement();
+				stm = new NamedStatementParser( connection, request.strValue(), request ).getPreparedStatement();
 				ResultSet result = stm.executeQuery();
 				if ( request.hasChildren( templateField ) ) {
 					resultSetToValueVectorWithTemplate( result, resultValue.getChildren( "row" ), request.getFirstChild( templateField ) );

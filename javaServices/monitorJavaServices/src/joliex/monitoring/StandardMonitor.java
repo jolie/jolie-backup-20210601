@@ -101,13 +101,13 @@ public class StandardMonitor extends AbstractMonitorJavaService
 	 */
 	public void setMonitor( Value request ) {
 		if ( request.getFirstChild( "triggeredEnabled" ).isDefined() ) {
-			triggerEnabled = request.getFirstChild( "triggeredEnabled" ).safeBoolValue();
+			triggerEnabled = request.getFirstChild( "triggeredEnabled" ).boolValue();
 		}
 		if ( request.getFirstChild( "triggerThreshold" ).isDefined() ) {
-			triggerThreshold = request.getFirstChild( "triggerThreshold" ).safeIntValue();
+			triggerThreshold = request.getFirstChild( "triggerThreshold" ).intValue();
 		}
 		if ( request.getFirstChild( "queueMax" ).isDefined() ) {
-			queueMax = request.getFirstChild( "queueMax" ).safeIntValue();
+			queueMax = request.getFirstChild( "queueMax" ).intValue();
 		}
 	}
 

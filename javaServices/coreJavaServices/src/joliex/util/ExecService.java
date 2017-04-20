@@ -40,16 +40,16 @@ public class ExecService extends JavaService
 		throws FaultException
 	{
 		List< String > command = new LinkedList< String >();
-		String[] str = request.safeStrValue().split( " " );
+		String[] str = request.strValue().split( " " );
 		command.addAll( Arrays.asList( str ) );
 
 		for( Value v : request.getChildren( "args" ) ) {
-			command.add( v.safeStrValue() );
+			command.add( v.strValue() );
 		}
 
 		ProcessBuilder builder = new ProcessBuilder( command );
 		if ( request.hasChildren( "workingDirectory" ) ) {
-			builder.directory( new File( request.getFirstChild( "workingDirectory" ).safeStrValue() ) );
+			builder.directory( new File( request.getFirstChild( "workingDirectory" ).strValue() ) );
 		}
 		try {
 
@@ -58,13 +58,13 @@ public class ExecService extends JavaService
 			Process p = builder.start();
 			StreamGobbler outputStreamGobbler = new StreamGobbler( p.getInputStream() );
 			if ( request.hasChildren( "stdOutConsoleEnable" ) ) {
-				if ( request.getFirstChild( "stdOutConsoleEnable" ).boolValue() ) {
+				if ( request.getFirstChild( "stdOutConsoleEnable" ).boolValueStrict() ) {
 					outputStreamGobbler.start();
 					stdOutConsoleEnable = true;
 				}
 			}
 			ValueVector waitFor = request.children().get( "waitFor" );
-			if ( waitFor == null || waitFor.first().intValue() > 0 ) {
+			if ( waitFor == null || waitFor.first().intValueStrict() > 0 ) {
 				int exitCode = p.waitFor();
 				response.getNewChild( "exitCode" ).setValue( exitCode );
 				if ( !stdOutConsoleEnable ) {

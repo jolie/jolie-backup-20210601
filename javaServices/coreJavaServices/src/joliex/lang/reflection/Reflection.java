@@ -121,12 +121,12 @@ public class Reflection extends JavaService
 	public Value invoke( Value request )
 		throws FaultException
 	{
-		final String operation = request.getFirstChild( "operation" ).safeStrValue();
-		final String outputPortName = request.getFirstChild( "outputPort" ).safeStrValue();
-		final String resourcePath = ( request.hasChildren( "resourcePath" ) ) ? request.getFirstChild( "resourcePath" ).safeStrValue() : "/";
+		final String operation = request.getFirstChild( "operation" ).strValue();
+		final String outputPortName = request.getFirstChild( "outputPort" ).strValue();
+		final String resourcePath = ( request.hasChildren( "resourcePath" ) ) ? request.getFirstChild( "resourcePath" ).strValue() : "/";
 		final Value data = request.getFirstChild( "data" );
 		try {
-			OutputPort port = interpreter.getOutputPort( request.getFirstChild( "outputPort").safeStrValue() );
+			OutputPort port = interpreter.getOutputPort( request.getFirstChild( "outputPort").strValue() );
 			OperationTypeDescription opDesc = port.getOperationTypeDescription( operation, resourcePath );
 			if ( opDesc == null ) {
 				throw new InvalidIdException( operation );

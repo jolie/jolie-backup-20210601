@@ -246,7 +246,7 @@ public class MetaJolie extends JavaService
 		if ( typedef instanceof TypeDefinitionLink ) {
 			type.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "name" ).setValue( ((TypeDefinitionLink) typedef).linkedTypeName() );
 			if ( name.getFirstChild( "domain" ).isDefined() ) {
-				type.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "domain" ).setValue( name.getFirstChild( "domain" ).safeStrValue() );
+				type.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "domain" ).setValue( name.getFirstChild( "domain" ).strValue() );
 			}
 		} else {
 			TypeInlineDefinition td = (TypeInlineDefinition) typedef;
@@ -393,15 +393,15 @@ public class MetaJolie extends JavaService
 		Value v;
         if ( name.getFirstChild( "domain" ).isDefined() && name.getFirstChild( "registry" ).isDefined() ) {
             try {
-                v = setName( name.getFirstChild( "name" ).safeStrValue(), name.getFirstChild( "domain" ).safeStrValue(), name.getFirstChild( "registry" ).strValue() );
+                v = setName( name.getFirstChild( "name" ).strValue(), name.getFirstChild( "domain" ).strValue(), name.getFirstChild( "registry" ).strValueStrict() );
             } catch ( TypeCastingException e ){
                 throw new FaultException( Constants.CASTING_EXCEPTION_FAULT_NAME, e );  
             }
             
         } else if ( name.getFirstChild( "domain" ).isDefined() && !name.getFirstChild( "registry" ).isDefined() ) {
-            v = setName( name.getFirstChild( "name" ).safeStrValue(), name.getFirstChild( "domain" ).safeStrValue() );
+            v = setName( name.getFirstChild( "name" ).strValue(), name.getFirstChild( "domain" ).strValue() );
         } else {
-            v = setName( name.getFirstChild( "name" ).safeStrValue() );
+            v = setName( name.getFirstChild( "name" ).strValue() );
         }    
 		
 		return v;
@@ -735,7 +735,7 @@ public class MetaJolie extends JavaService
 	public Value checkNativeType( Value request )
 	{
 		Value response = Value.create();
-		response.getFirstChild( "result" ).setValue( isNativeType( request.getFirstChild( "type_name" ).safeStrValue() ) );
+		response.getFirstChild( "result" ).setValue( isNativeType( request.getFirstChild( "type_name" ).strValue() ) );
 		return response;
 	}
 
@@ -747,7 +747,7 @@ public class MetaJolie extends JavaService
 		try {
             
 			response.getFirstChild( "name" ).deepCopy( setName( request.getFirstChild( "rolename" ) ) );
-			String[] args = getArgs( request.getFirstChild( "filename" ).safeStrValue() );
+			String[] args = getArgs( request.getFirstChild( "filename" ).strValue() );
 			CommandLineParser cmdParser = new CommandLineParser( args, MetaJolie.class.getClassLoader() );
 			Program program = ParsingUtils.parseProgram(
 				cmdParser.programStream(),
@@ -797,10 +797,10 @@ public class MetaJolie extends JavaService
 		List<InterfaceDefinition> interfaces = new ArrayList<InterfaceDefinition>();
 		Value response = Value.create();
 		try {
-			String[] args = getArgs( request.getFirstChild( "filename" ).safeStrValue() );
+			String[] args = getArgs( request.getFirstChild( "filename" ).strValue() );
 
 			if ( request.getFirstChild( "name" ).getFirstChild( "domain" ).isDefined() ) {
-				domain = request.getFirstChild( "name" ).getFirstChild( "domain" ).safeStrValue();
+				domain = request.getFirstChild( "name" ).getFirstChild( "domain" ).strValue();
 			}
 			CommandLineParser cmdParser = new CommandLineParser( args, MetaJolie.class.getClassLoader() );
 			Program program = ParsingUtils.parseProgram(
@@ -884,7 +884,7 @@ public class MetaJolie extends JavaService
 	{
 		Value response = Value.create();
 		try {
-			String[] args = getArgs( request.getFirstChild( "filename" ).safeStrValue() );
+			String[] args = getArgs( request.getFirstChild( "filename" ).strValue() );
 			
 			CommandLineParser cmdParser = new CommandLineParser( args, interpreter().getClassLoader() );
 			Program program = ParsingUtils.parseProgram(
@@ -936,8 +936,8 @@ public class MetaJolie extends JavaService
 		int index = 0;
 		while( index < types.size() && !found ) {
 			Value type = (Value) iterator.next();
-			String name = type.getFirstChild( "name" ).getFirstChild( "name" ).safeStrValue();
-			String domain = type.getFirstChild( "name" ).getFirstChild( "domain" ).safeStrValue();
+			String name = type.getFirstChild( "name" ).getFirstChild( "name" ).strValue();
+			String domain = type.getFirstChild( "name" ).getFirstChild( "domain" ).strValue();
 			if ( name.equals( typeName ) && domain.equals( typeDomain ) ) {
 				found = true;
 			}
@@ -952,7 +952,7 @@ public class MetaJolie extends JavaService
 		boolean found = false;
 		int index = 0;
 		while( !found && index < subTypes.size() ) {
-			if ( subTypes.get( index ).getFirstChild( "name" ).safeStrValue().equals( elementName ) ) {
+			if ( subTypes.get( index ).getFirstChild( "name" ).strValue().equals( elementName ) ) {
 				found = true;
 			}
 			index++;
@@ -962,11 +962,11 @@ public class MetaJolie extends JavaService
 		} else {
 			Value subType = subTypes.get( index - 1 );
 			// check cardinality
-			if ( messageVector.size() < subType.getFirstChild( "Cardinality" ).getFirstChild( "min" ).safeIntValue() ) {
+			if ( messageVector.size() < subType.getFirstChild( "Cardinality" ).getFirstChild( "min" ).intValue() ) {
 				throw new FaultException( "TypeMismatch" );
 			}
 			if ( subType.getFirstChild( "cardinality" ).getChildren( "max" ).size() > 0 ) {
-				if ( messageVector.size() > subType.getFirstChild( "cardinality" ).getFirstChild( "max" ).safeIntValue() ) {
+				if ( messageVector.size() > subType.getFirstChild( "cardinality" ).getFirstChild( "max" ).intValue() ) {
 					throw new FaultException( "TypeMismatch" );
 				}
 			}
@@ -975,8 +975,8 @@ public class MetaJolie extends JavaService
 				if ( subType.getChildren( "type_inline" ).size() > 0 ) {
 					castingType( subType.getFirstChild( "type_inline" ), messageVector.get( el ), types, response.getChildren( elementName ).get( el ) );
 				} else if ( subType.getChildren( "type_link" ).size() > 0 ) {
-					String name = subType.getFirstChild( "type_link" ).getFirstChild( "name" ).safeStrValue();
-					String domain = subType.getFirstChild( "type_link" ).getFirstChild( "domain" ).safeStrValue();
+					String name = subType.getFirstChild( "type_link" ).getFirstChild( "name" ).strValue();
+					String domain = subType.getFirstChild( "type_link" ).getFirstChild( "domain" ).strValue();
 					Value typeToCast = findType( types, name, domain );
 					castingType( typeToCast, messageVector.get( el ), types, response.getChildren( elementName ).get( el ) );
 				}
@@ -991,34 +991,34 @@ public class MetaJolie extends JavaService
 
 		// casting root
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "string_type" ).size() > 0 ) {
-			response.setValue( message.safeStrValue() );
+			response.setValue( message.strValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "int_type" ).size() > 0 ) {
-			response.setValue( message.safeIntValue() );
+			response.setValue( message.intValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "double_type" ).size() > 0 ) {
-			response.setValue( message.safeDoubleValue() );
+			response.setValue( message.doubleValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "any_type" ).size() > 0 ) {
-			response.setValue( message.safeStrValue() );
+			response.setValue( message.strValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "int_type" ).size() > 0 ) {
-			response.setValue( message.safeIntValue() );
+			response.setValue( message.intValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "void_type" ).size() > 0 ) {
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "long_type" ).size() > 0 ) {
-			response.setValue( message.safeLongValue() );
+			response.setValue( message.longValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "int_type" ).size() > 0 ) {
-			response.setValue( message.safeIntValue() );
+			response.setValue( message.intValue() );
 		}
 		if ( typeToCast.getFirstChild( "root_type" ).getChildren( "link" ).size() > 0 ) {
 			String domain = "";
 			if ( typeToCast.getFirstChild( "root_type" ).getFirstChild( "link" ).getChildren( "domain" ).size() > 0 ) {
-				domain = typeToCast.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "domain" ).safeStrValue();
+				domain = typeToCast.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "domain" ).strValue();
 			}
-			Value linkRootType = findType( types, typeToCast.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "name" ).safeStrValue(), domain ).getFirstChild( "root_type" );
+			Value linkRootType = findType( types, typeToCast.getFirstChild( "root_type" ).getFirstChild( "link" ).getFirstChild( "name" ).strValue(), domain ).getFirstChild( "root_type" );
 			castingType( linkRootType, message, types, response );
 		}
 
@@ -1037,8 +1037,8 @@ public class MetaJolie extends JavaService
 		throws FaultException
 	{
 		Value message = request.getFirstChild( "message" );
-		String messageTypeName = request.getFirstChild( "types" ).getFirstChild( "messageTypeName" ).getFirstChild( "name" ).safeStrValue();
-		String messageTypeDomain = request.getFirstChild( "types" ).getFirstChild( "messageTypeName" ).getFirstChild( "domain" ).safeStrValue();
+		String messageTypeName = request.getFirstChild( "types" ).getFirstChild( "messageTypeName" ).getFirstChild( "name" ).strValue();
+		String messageTypeDomain = request.getFirstChild( "types" ).getFirstChild( "messageTypeName" ).getFirstChild( "domain" ).strValue();
 		ValueVector types = request.getFirstChild( "types" ).getChildren( "types" );
 		Value response = Value.create();
 

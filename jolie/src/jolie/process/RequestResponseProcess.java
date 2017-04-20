@@ -263,7 +263,7 @@ public class RequestResponseProcess implements InputOperationProcess
 
 		if ( fault != null ) {
 			if ( typeMismatch != null ) {
-				Interpreter.getInstance().logWarning( typeMismatch.value().safeStrValue() );
+				Interpreter.getInstance().logWarning( typeMismatch.value().strValue() );
 			}
 			throw fault;
 		} else if ( typeMismatch != null ) {

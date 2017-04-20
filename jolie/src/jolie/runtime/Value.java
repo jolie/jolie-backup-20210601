@@ -546,15 +546,15 @@ public abstract class Value implements Expression, Cloneable
 			if ( isByteArray() ) {
 				r = byteArrayValue().equals( val.byteArrayValue() );
 			} else if ( isString() ) {
-				r = safeStrValue().equals( val.safeStrValue() );
+				r = strValue().equals( val.strValue() );
 			} else if ( isInt() ) {
-				r = safeIntValue() == val.safeIntValue();
+				r = intValue() == val.intValue();
 			} else if ( isDouble() ) {
-				r = safeDoubleValue() == val.safeDoubleValue();
+				r = doubleValue() == val.doubleValue();
 			} else if ( isBool() ) {
-				r = safeBoolValue() == val.safeBoolValue();
+				r = boolValue() == val.boolValue();
 			} else if ( isLong() ) {
-				r = safeLongValue() == val.safeLongValue();
+				r = longValue() == val.longValue();
 			} else if ( valueObject() != null ) {
 				r = valueObject().equals( val.valueObject() );
 			}
@@ -619,12 +619,7 @@ public abstract class Value implements Expression, Cloneable
 		return (CommChannel)o;
 	}
 	
-	public String strValue() throws TypeCastingException
-	{
-                return strValueStrict();
-	}
-    
-    public String safeStrValue() {
+	public String strValue() {
             String safeStr = "";
             try {
                     safeStr = strValueStrict();
@@ -702,12 +697,8 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public int intValue() throws TypeCastingException
-	{
-            return intValueStrict();
-	}
     
-    public int safeIntValue()
+    public int intValue()
     {
             int intValue = 0;
             try {
@@ -745,13 +736,8 @@ public abstract class Value implements Expression, Cloneable
 		}
 		return r;
 	}
-	
-	public boolean boolValue() throws TypeCastingException
-	{
-            return boolValueStrict();
-	}
     
-    public boolean safeBoolValue() 
+    public boolean boolValue() 
     {
             boolean boolValue = false;
             try {
@@ -785,12 +771,7 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public long longValue() throws TypeCastingException
-	{
-            return longValueStrict();
-	}
-    
-    public long safeLongValue() {
+    public long longValue() {
             long longValue = 0L;
             try {
                 longValue = longValueStrict();
@@ -828,12 +809,7 @@ public abstract class Value implements Expression, Cloneable
 		return r;
 	}
 	
-	public double doubleValue() throws TypeCastingException
-	{
-            return doubleValueStrict();
-	}
-    
-    public double safeDoubleValue() {
+    public double doubleValue() {
             double doubleValue = 0.0;
             try {
                 doubleValue = doubleValueStrict();
@@ -875,17 +851,17 @@ public abstract class Value implements Expression, Cloneable
 	{
 		if ( isDefined() ) {
 			if ( val.isString() ) {
-				setValue( strValue() + val.strValue() );
+				setValue(strValue() + val.strValueStrict() );
 			} else if ( isInt() ) {
-				setValue( intValue() + val.intValue() );
+				setValue(intValueStrict() + val.intValue() );
 			} else if ( isLong() ) {
-				setValue( longValue() + val.longValue() );
+				setValue(longValueStrict() + val.longValue() );
 			} else if ( isDouble() ) {
-				setValue( doubleValue() + val.doubleValue() );
+				setValue(doubleValueStrict() + val.doubleValue() );
 			} else if ( isBool() ) {
-				setValue( boolValue() || val.boolValue() );
+				setValue(boolValueStrict() || val.boolValue() );
 			} else {
-				setValue( strValue() + val.strValue() );
+				setValue(strValue() + val.strValue() );
 			}
 		} else {
 			assignValue( val );
@@ -896,22 +872,22 @@ public abstract class Value implements Expression, Cloneable
 	{
 		if ( !isDefined() ) {
 			if ( val.isDouble() ) {
-				setValue( -val.doubleValue() );
+				setValue(-val.doubleValueStrict() );
 			} else if ( val.isInt() ) {
-				setValue( -val.intValue() );
+				setValue(-val.intValueStrict() );
 			} else if ( val.isLong() ) {
-				setValue( -val.longValue() );
+				setValue(-val.longValueStrict() );
 			} else if ( val.isBool() ) {
-				setValue( !val.boolValue() );
+				setValue(!val.boolValueStrict() );
 			} else {
 				assignValue( val );
 			}
 		} else if ( isInt() ) {
-			setValue( intValue() - val.intValue() );
+			setValue(intValueStrict() - val.intValueStrict() );
 		} else if ( isLong() ) {
-			setValue( longValue() - val.longValue() );
+			setValue(longValueStrict() - val.longValueStrict() );
 		} else if ( isDouble() ) {
-			setValue( doubleValue() - val.doubleValue() );
+			setValue(doubleValueStrict() - val.doubleValueStrict() );
 		}
 	}
 	
@@ -919,13 +895,13 @@ public abstract class Value implements Expression, Cloneable
 	{
 		if ( isDefined() ) {
 			if ( isInt() ) {
-				setValue( intValue() * val.intValue() );
+				setValue(intValueStrict() * val.intValueStrict() );
 			} else if ( isBool() ) {
-				setValue( boolValue() && val.boolValue() );
+				setValue(boolValueStrict() && val.boolValueStrict() );
 			} else if ( isLong() ) {
-				setValue( longValue() * val.longValue() );
+				setValue(longValueStrict() * val.longValueStrict() );
 			} else if ( isDouble() ) {
-				setValue( doubleValue() * val.doubleValue() );
+				setValue(doubleValueStrict() * val.doubleValueStrict() );
 			}
 		} else {
 			assignValue( val );
@@ -937,11 +913,11 @@ public abstract class Value implements Expression, Cloneable
 		if ( !isDefined() ) {
 			setValue( 0 );
 		} else if ( isInt() ) {
-			setValue( intValue() / val.intValue() );
+			setValue(intValueStrict() / val.intValueStrict() );
 		} else if ( isLong() ) {
-			setValue( longValue() / val.longValue() );
+			setValue(longValueStrict() / val.longValueStrict() );
 		} else if ( isDouble() ) {
-			setValue( doubleValue() / val.doubleValue() );
+			setValue(doubleValueStrict() / val.doubleValueStrict() );
 		}
 	}
 	
@@ -950,11 +926,11 @@ public abstract class Value implements Expression, Cloneable
 		if ( !isDefined() ) {
 			assignValue( val );
 		} else if ( isInt() ) {
-			setValue( intValue() % val.intValue() );
+			setValue(intValueStrict() % val.intValueStrict() );
 		} else if ( isLong() ) {
-			setValue( longValue() % val.longValue() );
+			setValue(longValueStrict() % val.longValueStrict() );
 		} else if ( isDouble() ) {
-			setValue( doubleValue() % val.doubleValue() );
+			setValue(doubleValueStrict() % val.doubleValueStrict() );
 		}
 	}
 	

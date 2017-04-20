@@ -54,7 +54,7 @@ public class PostDecrementProcess implements Process, Expression
 			return;
 		Value val = path.getValue();
         try {
-            val.setValue( val.intValue() - 1 );
+            val.setValue( val.intValueStrict() - 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
                 Constants.CASTING_EXCEPTION_FAULT_NAME,
@@ -68,8 +68,8 @@ public class PostDecrementProcess implements Process, Expression
 		Value val = path.getValue();
 		Value orig = Value.create();
         try {
-            orig.setValue( val.intValue() );
-            val.setValue( val.intValue() - 1 );
+            orig.setValue( val.intValueStrict() );
+            val.setValue( val.intValueStrict() - 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
                 Constants.CASTING_EXCEPTION_FAULT_NAME,

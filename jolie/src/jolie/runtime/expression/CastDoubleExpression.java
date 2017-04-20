@@ -21,6 +21,7 @@
 
 package jolie.runtime.expression;
 
+import jolie.lang.Constants;
 import jolie.process.TransformationReason;
 import jolie.runtime.FaultException;
 import jolie.runtime.Value;
@@ -44,11 +45,12 @@ public class CastDoubleExpression implements Expression
 	{
 		Value v;
         try {
-            v = Value.create( expression.evaluate().doubleValue() );
+            v = Value.create( expression.evaluate().doubleValueStrict() );
         } catch ( TypeCastingException e ){
-            throw new FaultException( 
-              TYPE_CASTING_EXCEPTION, 
-              "Could to cast expression to a double value" );
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could to cast expression to a double value"
+            );
         }
         return v;
 	}

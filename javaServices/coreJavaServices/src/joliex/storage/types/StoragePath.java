@@ -107,8 +107,8 @@ public class StoragePath implements Iterable< Node >
 		int i = 0;
 		for( Value nodeValue : nodesVector ) {
 			nodes[ i++ ] = new Node(
-				nodeValue.getFirstChild( "name" ).safeStrValue(),
-				nodeValue.getFirstChild( "index" ).safeIntValue()
+				nodeValue.getFirstChild( "name" ).strValue(),
+				nodeValue.getFirstChild( "index" ).intValue()
 			);
 		}
 		return new StoragePath( nodes );

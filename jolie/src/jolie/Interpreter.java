@@ -664,7 +664,15 @@ public class Interpreter
 	 */
 	public void logUnhandledFault( FaultException fault )
 	{
-		logInfo( "Thrown unhandled fault: " + fault.faultName() );
+		StringBuilder sb = new StringBuilder();
+        sb.append( "Thrown unhandled fault: " ).append( fault.faultName() );
+        sb.append( System.lineSeparator() );
+        sb.append( fault.getMessage() );
+        sb.append( System.lineSeparator() );
+        if ( fault.value().getFirstChild( "stackTrace" ) != null ){
+            sb.append( fault.value().getFirstChild( "stackTrace" ).strValue() );
+        }
+        logInfo( sb.toString() );
 	}
 
 	/**

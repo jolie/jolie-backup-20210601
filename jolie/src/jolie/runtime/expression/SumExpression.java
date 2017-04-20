@@ -63,9 +63,10 @@ public final class SumExpression implements Expression
                 }
             }
         } catch ( TypeCastingException e ){
-            throw new FaultException( 
-              TYPE_CASTING_EXCEPTION, 
-              "Could to cast expression to a computable value" );
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                 "Could not cast expression to a computable value"
+            );
         }
 
 		

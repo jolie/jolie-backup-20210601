@@ -44,7 +44,7 @@ public class OrCondition implements Expression
 	public Value evaluate() throws FaultException
 	{
 		for( Expression cond : children ) {
-            if ( cond.evaluate().safeBoolValue() ) {
+            if ( cond.evaluate().boolValue() ) {
 				return Value.create( true );
 			}
 		}

@@ -22,6 +22,7 @@
 
 package jolie.runtime.expression;
 
+import jolie.lang.Constants;
 import jolie.process.TransformationReason;
 import jolie.runtime.FaultException;
 import jolie.runtime.Value;
@@ -45,9 +46,12 @@ public class CastStringExpression implements Expression
 	{
 		Value v;
         try {
-            v = Value.create( expression.evaluate().strValue() );
+            v = Value.create( expression.evaluate().strValueStrict() );
         } catch( TypeCastingException e ){
-            throw new FaultException( TYPE_CASTING_EXCEPTION, "Could to cast expression to a string value");
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                 "Could to cast expression to a string value"
+            );
         }
         return v;
 	}

@@ -42,6 +42,6 @@ public class NotExpression implements Expression
 	
 	public Value evaluate() throws FaultException
 	{
-		return Value.create( !( expression.evaluate().safeBoolValue() ) );
+		return Value.create( !( expression.evaluate().boolValue() ) );
 	}
 }

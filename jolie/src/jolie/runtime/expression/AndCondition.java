@@ -57,7 +57,7 @@ public class AndCondition implements Expression
 	public Value evaluate() throws FaultException
 	{
 		for( Expression condition : children ) {
-			if ( condition.evaluate().safeBoolValue() == false ) {
+			if ( condition.evaluate().boolValue() == false ) {
 				return Value.create( false );
 			}
 		}

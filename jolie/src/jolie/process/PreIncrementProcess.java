@@ -55,7 +55,7 @@ public class PreIncrementProcess implements Process, Expression
 			return;
 		final Value val = path.getValue();
         try {
-            val.setValue( val.intValue() + 1 );
+            val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
               Constants.CASTING_EXCEPTION_FAULT_NAME,
@@ -70,7 +70,7 @@ public class PreIncrementProcess implements Process, Expression
 	{
 		final Value val = path.getValue();
         try {
-            val.setValue( val.intValue() + 1 );
+            val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
               Constants.CASTING_EXCEPTION_FAULT_NAME,

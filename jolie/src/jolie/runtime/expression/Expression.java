@@ -31,7 +31,6 @@ public interface Expression
 {
 	public Value evaluate() throws FaultException;
 	public Expression cloneExpression( TransformationReason reason );
-    public String TYPE_CASTING_EXCEPTION = "TypeCastingException";
 	
 	public class Operand
 	{

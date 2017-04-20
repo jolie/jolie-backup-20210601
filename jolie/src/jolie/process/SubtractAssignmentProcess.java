@@ -22,6 +22,7 @@
 package jolie.process;
 
 import jolie.ExecutionThread;
+import jolie.lang.Constants;
 import jolie.runtime.FaultException;
 import jolie.runtime.expression.Expression;
 import jolie.runtime.Value;
@@ -74,9 +75,9 @@ public class SubtractAssignmentProcess implements Process, Expression
         try {
     		varPath.getValue().subtract( expression.evaluate() );
         } catch ( TypeCastingException e ){
-            throw new FaultException (
-              "TypeCastingException",
-              "Could not cast value to compute the subtraction"
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not cast value to compute the subtraction"
             );
         }
 
@@ -90,8 +91,8 @@ public class SubtractAssignmentProcess implements Process, Expression
             
         } catch ( TypeCastingException e ){
             throw new FaultException(
-              "TypeCastingException",
-              "Could not cast value to compute the subtraction"
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                "Could not cast value to compute the subtraction"
             );
         }
 		

@@ -22,6 +22,7 @@
 
 package jolie.runtime.expression;
 
+import jolie.lang.Constants;
 import jolie.process.TransformationReason;
 import jolie.runtime.FaultException;
 import jolie.runtime.Value;
@@ -45,11 +46,12 @@ public class CastLongExpression implements Expression
 	{
 		Value v;
         try {
-            v = Value.create( expression.evaluate().longValue() );
+            v = Value.create( expression.evaluate().longValueStrict() );
         } catch ( TypeCastingException e ){
-            throw new FaultException( 
-              TYPE_CASTING_EXCEPTION, 
-              "Could to cast expression to a long value");
+            throw new FaultException(
+                Constants.CASTING_EXCEPTION_FAULT_NAME,
+                  "Could to cast expression to a long value"
+            );
         }
         return v;
 	}

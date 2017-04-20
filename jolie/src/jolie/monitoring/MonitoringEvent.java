@@ -77,9 +77,9 @@ public class MonitoringEvent implements ValueConverter
 	public static MonitoringEvent fromValue( Value value )
 	{
 		return new MonitoringEvent(
-			value.getFirstChild( "type" ).safeStrValue(),
-			value.getFirstChild( "timestamp" ).safeLongValue(),
-			value.getFirstChild( "memory" ).safeLongValue(),
+			value.getFirstChild( "type" ).strValue(),
+			value.getFirstChild( "timestamp" ).longValue(),
+			value.getFirstChild( "memory" ).longValue(),
 			value.getFirstChild( "data" )
 		);
 	}

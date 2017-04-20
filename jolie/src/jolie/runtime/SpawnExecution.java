@@ -83,7 +83,7 @@ public class SpawnExecution
 		}
         int upperBound = 0;
         try {
-            upperBound = parentSpawnProcess.upperBound().evaluate().intValue();
+            upperBound = parentSpawnProcess.upperBound().evaluate().intValueStrict();
         } catch ( TypeCastingException e ) { }
 		latch = new CountDownLatch( upperBound );
 		SpawnedThread thread;

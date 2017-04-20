@@ -66,11 +66,11 @@ public class ZipUtils extends JavaService
 		Value response = Value.create();
 		try {
 			ZipFile file = new ZipFile(
-				request.getFirstChild( "filename" ).safeStrValue()
+				request.getFirstChild( "filename" ).strValue()
 			);
 			
 			ZipEntry entry = file.getEntry(
-				request.getFirstChild( "entry" ).safeStrValue()
+				request.getFirstChild( "entry" ).strValue()
 			);
 			if ( entry != null ) {
 				response.setValue(
@@ -106,8 +106,8 @@ public class ZipUtils extends JavaService
 	}
 	
 	public  Value unzip( Value request ) throws FaultException {
-		String targetPath = request.getFirstChild( "targetPath" ).safeStrValue();
-		String filename = request.getFirstChild( "filename" ).safeStrValue();
+		String targetPath = request.getFirstChild( "targetPath" ).strValue();
+		String filename = request.getFirstChild( "filename" ).strValue();
 		
 		Value response = Value.create();
 		

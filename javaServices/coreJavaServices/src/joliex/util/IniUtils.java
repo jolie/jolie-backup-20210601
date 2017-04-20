@@ -50,12 +50,12 @@ public class IniUtils extends JavaService
 	public Value parseIniFile( Value request )
 		throws FaultException
 	{
-		String filename = request.safeStrValue();
+		String filename = request.strValue();
 		File file = new File( filename );
 		InputStream istream = null;
 		String charset = null;
 		if ( request.hasChildren( "charset" ) ) {
-			charset = request.getFirstChild( "charset" ).safeStrValue();
+			charset = request.getFirstChild( "charset" ).strValue();
 		}
 
 		try {

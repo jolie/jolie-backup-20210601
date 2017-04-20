@@ -55,7 +55,7 @@ public class PostIncrementProcess implements Process, Expression
 			return;
 		final Value val = path.getValue();
         try {
-            val.setValue( val.intValue() + 1 );
+            val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
                 Constants.CASTING_EXCEPTION_FAULT_NAME,
@@ -71,8 +71,8 @@ public class PostIncrementProcess implements Process, Expression
 		final Value val = path.getValue();
 		final Value orig = Value.create();
         try {
-            orig.setValue( val.intValue() );
-            val.setValue( val.intValue() + 1 );
+            orig.setValue( val.intValueStrict() );
+            val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(
                 Constants.CASTING_EXCEPTION_FAULT_NAME,

@@ -100,12 +100,12 @@ public class TimeService extends JavaService
 
 	public void setNextTimeout( Value request )
 	{
-		long waitTime = request.safeIntValue();
+		long waitTime = request.intValue();
 		String callbackOperation = null;
 		ValueVector vec;
 		Value callbackValue = null;
 		if ( (vec=request.children().get( "operation" )) != null ) {
-			callbackOperation = vec.first().safeStrValue();
+			callbackOperation = vec.first().strValue();
 		}
 		if ( (vec=request.children().get( "message" )) != null ) {
 			callbackValue = vec.first();
@@ -119,7 +119,7 @@ public class TimeService extends JavaService
 		long waitTime = 0;
 		try {
 			synchronized( dateTimeFormat ) {
-				Date date = dateTimeFormat.parse( request.safeStrValue() );
+				Date date = dateTimeFormat.parse( request.strValue() );
 				waitTime = date.getTime() - (new Date()).getTime();
 			}
 		} catch( ParseException e ) {}
@@ -128,7 +128,7 @@ public class TimeService extends JavaService
 		ValueVector vec;
 		Value callbackValue = null;
 		if ( (vec=request.children().get( "operation" )) != null ) {
-			callbackOperation = vec.first().safeStrValue();
+			callbackOperation = vec.first().strValue();
 		}
 		if ( (vec=request.children().get( "message" )) != null ) {
 			callbackValue = vec.first();
@@ -143,7 +143,7 @@ public class TimeService extends JavaService
 		try {
 			synchronized( dateTimeFormat ) {
 				String today = dateFormat.format( new Date() );
-				Date date = dateTimeFormat.parse( today + " " + request.safeStrValue() );
+				Date date = dateTimeFormat.parse( today + " " + request.strValue() );
 				waitTime = date.getTime() - (new Date()).getTime();
 			}
 		} catch( ParseException pe ) {}
@@ -152,7 +152,7 @@ public class TimeService extends JavaService
 		ValueVector vec;
 		Value callbackValue = null;
 		if ( (vec=request.children().get( "operation" )) != null )
-			callbackOperation = vec.first().safeStrValue();
+			callbackOperation = vec.first().strValue();
 		if ( (vec=request.children().get( "message" )) != null )
 			callbackValue = vec.first();
 
@@ -180,10 +180,10 @@ public class TimeService extends JavaService
 		String result = null;
 		try {
 			String format;
-			if ( request.getFirstChild( "format" ).strValue().isEmpty() ) {
+			if ( request.getFirstChild( "format" ).strValueStrict().isEmpty() ) {
 				format = "dd/MM/yyyy HH:mm:ss";
 			} else {
-				format = request.getFirstChild( "format" ).strValue();
+				format = request.getFirstChild( "format" ).strValueStrict();
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat( format );
 			final Date now = new Date();
@@ -200,12 +200,12 @@ public class TimeService extends JavaService
 		Value result = Value.create();
 		try {
 			String format;
-			if ( request.getFirstChild( "format" ).strValue().isEmpty() ) {
+			if ( request.getFirstChild( "format" ).strValueStrict().isEmpty() ) {
 				format = "dd/MM/yyyy HH:mm:ss";
 			} else {
-				format = request.getFirstChild( "format" ).strValue();
+				format = request.getFirstChild( "format" ).strValueStrict();
 			}
-			long tm = request.longValue();
+			long tm = request.longValueStrict();
 			SimpleDateFormat sdf = new SimpleDateFormat( format );
 			final Date timestamp = new Date( tm );
 			result.setValue(sdf.format( timestamp ));
@@ -251,14 +251,14 @@ public class TimeService extends JavaService
 		Value v = Value.create();
 		try {
 			String format;
-			if ( request.getFirstChild( "format" ).safeStrValue().isEmpty() ) {
+			if ( request.getFirstChild( "format" ).strValue().isEmpty() ) {
 				format = "dd/MM/yyyy";
 			} else {
-				format = request.getFirstChild( "format" ).safeStrValue();
+				format = request.getFirstChild( "format" ).strValue();
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat( format );
 			GregorianCalendar cal = new GregorianCalendar();
-			final Date dt = sdf.parse( request.safeStrValue() );
+			final Date dt = sdf.parse( request.strValue() );
 			cal.setTimeInMillis( dt.getTime() );
 			v.getFirstChild( "day" ).setValue( cal.get( Calendar.DAY_OF_MONTH ) );
 			v.getFirstChild( "month" ).setValue( cal.get( Calendar.MONTH ) + 1 );
@@ -283,13 +283,13 @@ public class TimeService extends JavaService
 		Value v = Value.create();
 		try {
 			String format;
-			if ( request.getFirstChild( "format" ).safeStrValue().isEmpty() ) {
+			if ( request.getFirstChild( "format" ).strValue().isEmpty() ) {
 				format = "dd/MM/yyyy hh:ss:mm";
 			} else {
-				format = request.getFirstChild( "format" ).safeStrValue();
+				format = request.getFirstChild( "format" ).strValue();
 			}
 			if ( request.hasChildren( "language" ) ) {
-				String language = request.getFirstChild( "language" ).safeStrValue();
+				String language = request.getFirstChild( "language" ).strValue();
 				if ( language.equals( "us" ) ) {
 					sdf = new SimpleDateFormat( format, Locale.ENGLISH );
 				} else if ( language.equals( "it" ) ) {
@@ -302,7 +302,7 @@ public class TimeService extends JavaService
 			}
 
 			GregorianCalendar cal = new GregorianCalendar();
-			final Date dt = sdf.parse( request.safeStrValue() );
+			final Date dt = sdf.parse( request.strValue() );
 			cal.setTimeInMillis( dt.getTime() );
 			v.getFirstChild( "day" ).setValue( cal.get( Calendar.DAY_OF_MONTH ) );
 			v.getFirstChild( "month" ).setValue( cal.get( Calendar.MONTH ) + 1 );
@@ -329,7 +329,7 @@ public class TimeService extends JavaService
 		try {
 			Value v = Value.create();
 			DateFormat sdf = new SimpleDateFormat( "kk:mm:ss" );
-			Date date = sdf.parse( request.safeStrValue() );
+			Date date = sdf.parse( request.strValue() );
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis( date.getTime() );
 			v.getFirstChild( "hour" ).setValue( calendar.get( Calendar.HOUR_OF_DAY ) );
@@ -351,13 +351,13 @@ public class TimeService extends JavaService
 		try {
 			String format;
 			if ( request.hasChildren( "format" ) ) {
-				format = request.getFirstChild( "format" ).safeStrValue();
+				format = request.getFirstChild( "format" ).strValue();
 			} else {
 				format = "dd/MM/yyyy";
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat( format );
-			final Date dt1 = sdf.parse( request.getFirstChild( "date1" ).safeStrValue() );
-			final Date dt2 = sdf.parse( request.getFirstChild( "date2" ).safeStrValue() );
+			final Date dt1 = sdf.parse( request.getFirstChild( "date1" ).strValue() );
+			final Date dt2 = sdf.parse( request.getFirstChild( "date2" ).strValue() );
 			Long result = (dt1.getTime() - dt2.getTime()) / (1000 * 60 * 60 * 24);
 			v.setValue( result.intValue() );
 		} catch( ParseException pe ) {
@@ -373,8 +373,8 @@ public class TimeService extends JavaService
 		try {
 
 			DateFormat sdf = new SimpleDateFormat( "kk:mm:ss" );
-			final Date dt1 = sdf.parse( request.getFirstChild( "time1" ).safeStrValue() );
-			final Date dt2 = sdf.parse( request.getFirstChild( "time2" ).safeStrValue() );
+			final Date dt1 = sdf.parse( request.getFirstChild( "time1" ).strValue() );
+			final Date dt2 = sdf.parse( request.getFirstChild( "time2" ).strValue() );
 
 			Long result = new Long( (dt1.getTime() - dt2.getTime()) );
 			v.setValue( result.intValue() );
@@ -391,7 +391,7 @@ public class TimeService extends JavaService
 		TimeZone timeZone = TimeZone.getTimeZone( "GMT" );
 
 		Calendar calendar = Calendar.getInstance( timeZone );
-		calendar.setTimeInMillis( request.safeLongValue() );
+		calendar.setTimeInMillis( request.longValue() );
 		v.getFirstChild( "hour" ).setValue( calendar.get( Calendar.HOUR_OF_DAY ) );
 		v.getFirstChild( "minute" ).setValue( calendar.get( Calendar.MINUTE ) );
 		v.getFirstChild( "second" ).setValue( calendar.get( Calendar.SECOND ) );
@@ -403,13 +403,13 @@ public class TimeService extends JavaService
 	{
 		try {
 			String format;
-			if ( request.getFirstChild( "format" ).safeStrValue().isEmpty() ) {
+			if ( request.getFirstChild( "format" ).strValue().isEmpty() ) {
 				format = "dd/MM/yyyy kk:mm:ss";
 			} else {
-				format = request.getFirstChild( "format" ).safeStrValue();
+				format = request.getFirstChild( "format" ).strValue();
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat( format );
-			final Date dt = sdf.parse( request.safeStrValue() );
+			final Date dt = sdf.parse( request.strValue() );
 
 			return dt.getTime();
 		} catch( ParseException pe ) {
@@ -426,7 +426,7 @@ public class TimeService extends JavaService
 
 		if (request.hasChildren( "timeunit" )) {
 			try {
-				unit = TimeUnit.valueOf( request.getFirstChild( "timeunit" ).strValue().toUpperCase() );
+				unit = TimeUnit.valueOf( request.getFirstChild( "timeunit" ).strValueStrict().toUpperCase() );
 			} catch ( Exception e ) {
 				throw new FaultException( "InvalidTimeUnit", e );
 			}
@@ -436,14 +436,14 @@ public class TimeService extends JavaService
 
 		String operationName;
 		if (request.hasChildren( "operation" )) {
-			operationName = request.getFirstChild( "operation" ).safeStrValue();
+			operationName = request.getFirstChild( "operation" ).strValue();
 		} else {
 			operationName = "timeout";
 		}
 
 		ScheduledFuture scheduledFuture = executor.schedule( () -> {
 			sendMessage( CommMessage.createRequest( operationName, "/", request.getFirstChild( "message" ) ) );
-		}, request.safeIntValue(), unit );
+		}, request.intValue(), unit );
 		scheduledFutureHashMap.put(timeoutId, scheduledFuture);
 		return timeoutId;
 	}
@@ -451,7 +451,7 @@ public class TimeService extends JavaService
 	@RequestResponse
 	public Boolean cancelTimeout( Value request )
 	{
-		long timeoutId = request.safeLongValue();
+		long timeoutId = request.longValue();
 		ScheduledFuture f = scheduledFutureHashMap.remove( timeoutId );
 		return f != null && f.cancel( false );
 	}

@@ -105,7 +105,7 @@ public class SolicitResponseProcess implements Process
 					outputPort.getResourcePath(),
 					( outputExpression == null ) ? Value.UNDEFINED_VALUE : outputExpression.evaluate()
 				);
-
+            
 			log( "SENDING", message );
 			if ( types.requestType() != null ) {
 				try {
@@ -181,12 +181,12 @@ public class SolicitResponseProcess implements Process
 				installProcess.run();
 			} catch( ExitingException e ) { assert false; }
 		} catch( IOException e ) {
-			throw new FaultException( Constants.IO_EXCEPTION_FAULT_NAME, e );
+            throw new FaultException( Constants.IO_EXCEPTION_FAULT_NAME, e );
 		} catch( URISyntaxException e ) {
 			Interpreter.getInstance().logSevere( e );
 		} catch( TypeCheckingException e ) {
 			throw new FaultException( Constants.TYPE_MISMATCH_FAULT_NAME, "Output message TypeMismatch (" + operationId + "@" + outputPort.id() + "): " + e.getMessage() );
-		} finally {
+        } finally {
 			if ( channel != null ) {
 				try {
 					channel.release();

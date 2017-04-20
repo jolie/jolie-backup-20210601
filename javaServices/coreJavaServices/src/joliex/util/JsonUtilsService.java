@@ -61,7 +61,7 @@ public class JsonUtilsService extends JavaService
 
 		String charset = null;
 		if ( request.hasChildren( "charset" ) ) {
-			charset = request.getFirstChild( "charset" ).safeStrValue();
+			charset = request.getFirstChild( "charset" ).strValue();
 		}
 
 		try {
@@ -69,9 +69,9 @@ public class JsonUtilsService extends JavaService
 			if ( request.isByteArray() && charset != null ) {
 				str = new String( request.byteArrayValue().getBytes(), charset );
 			} else {
-				str = request.safeStrValue();
+				str = request.strValue();
 			}
-			JsUtils.parseJsonIntoValue( new StringReader( str ), ret, request.getFirstChild( "strictEncoding" ).safeBoolValue() );
+			JsUtils.parseJsonIntoValue( new StringReader( str ), ret, request.getFirstChild( "strictEncoding" ).boolValue() );
 		} catch( IOException e ) {
 			throw new FaultException( "Jolie value generation from JSON string failed" );
 		}

@@ -102,7 +102,7 @@ public class FaultException extends Exception
 		builder.append( faultName );
 		builder.append( ": " );
                 try {
-                        builder.append( value.strValue() );
+                        builder.append( value.strValueStrict() );
                 } catch ( TypeCastingException e ){
                         builder.append( "Exception in parsing Exception message" );
                 }

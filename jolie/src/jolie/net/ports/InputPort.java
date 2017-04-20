@@ -122,7 +122,7 @@ public class InputPort implements Port
 	{
 		URI uri = null;
         try {
-            uri = URI.create( locationVariablePath.getValue().safeStrValue() );
+            uri = URI.create( locationVariablePath.getValue().strValue() );
         } catch ( FaultException e ){
             e.printStackTrace();
         }

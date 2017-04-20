@@ -68,14 +68,14 @@ public class XmlStorage extends AbstractStorageService
 		throws FaultException
 	{
 		try {
-			xmlFile = new File( request.getFirstChild( "filename" ).strValue() );
+			xmlFile = new File( request.getFirstChild( "filename" ).strValueStrict() );
 			if ( xmlFile.exists() == false ) {
 				xmlFile.createNewFile();
 				valueToFile( Value.create() );
 			}
 
 			if ( request.hasChildren( "charset" ) ) {
-				charset = Charset.forName( request.getFirstChild( "charset" ).strValue() );
+				charset = Charset.forName( request.getFirstChild( "charset" ).strValueStrict() );
 			}
 		} catch( Exception e ) {
 			throw new FaultException( "StorageFault", e.getMessage() );

@@ -51,7 +51,7 @@ public class WhileProcess implements Process
 		if ( ExecutionThread.currentThread().isKilled() ) {
 			return;
 		}
-		while( condition.evaluate().safeBoolValue() ) {
+		while( condition.evaluate().boolValue() ) {
 			process.run();
 			if ( ExecutionThread.currentThread().isKilled() ) {
 				return;

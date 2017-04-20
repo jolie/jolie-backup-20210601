@@ -65,15 +65,15 @@ public class JolieGWTConverter
 	public static void jolieToGwtValue( jolie.runtime.Value value, joliex.gwt.client.Value retValue )
 	{	
 		if ( value.isString() ) {
-			retValue.setValue( value.safeStrValue() );
+			retValue.setValue( value.strValue() );
 		} else if ( value.isInt() ) {
-			retValue.setValue( value.safeIntValue() );
+			retValue.setValue( value.intValue() );
 		} else if ( value.isDouble() ) {
-			retValue.setValue( value.safeDoubleValue() );
+			retValue.setValue( value.doubleValue() );
 		} else if ( value.isLong() ) {
-			retValue.setValue( value.safeLongValue() );
+			retValue.setValue( value.longValue() );
 		} else if ( value.isBool() ) {
-			retValue.setValue( value.safeBoolValue() );
+			retValue.setValue( value.boolValue() );
 		} else if ( value.valueObject() != null ) {
 			retValue.setValue( value.valueObject().toString() );
 		}
