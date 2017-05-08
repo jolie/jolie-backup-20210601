@@ -68,6 +68,9 @@ public class PostDecrementProcess implements Process, Expression
 		Value val = path.getValue();
 		Value orig = Value.create();
         try {
+            if ( val.valueObject() == null ){
+                val.setValue( 0 );
+            }
             orig.setValue( val.intValueStrict() );
             val.setValue( val.intValueStrict() - 1 );
         } catch ( TypeCastingException e ){

@@ -70,6 +70,9 @@ public class PreIncrementProcess implements Process, Expression
 	{
 		final Value val = path.getValue();
         try {
+            if ( val.valueObject() == null ){
+                val.setValue( 0 );
+            }
             val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
             throw new FaultException(

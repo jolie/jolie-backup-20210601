@@ -71,6 +71,9 @@ public class PostIncrementProcess implements Process, Expression
 		final Value val = path.getValue();
 		final Value orig = Value.create();
         try {
+            if ( val.valueObject() == null ){
+                val.setValue( 0 );
+            }
             orig.setValue( val.intValueStrict() );
             val.setValue( val.intValueStrict() + 1 );
         } catch ( TypeCastingException e ){
