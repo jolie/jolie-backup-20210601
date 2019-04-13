@@ -92,14 +92,24 @@ type SemanticExceptionType: void {
 
 interface MetaJolieInterface {
 RequestResponse:
+  /** check if a type name corresponds to a native type one */
 	checkNativeType( CheckNativeTypeRequest )( CheckNativeTypeResponse ),
+
+  /** get the all metadata definitions of a service */
 	getMetaData( GetMetaDataRequest )( GetMetaDataResponse )
 	    throws  ParserException( ParserExceptionType )
 		          SemanticException( SemanticExceptionType ),
+
+  /** get a complete metadata definition of an input port of a service equipped with all the types and interfaces */
 	getInputPortMetaData( GetInputPortMetaDataRequest )( GetInputPortMetaDataResponse )
 	    throws  InputPortMetaDataFault
 		          ParserException( ParserExceptionType )
 		          SemanticException( SemanticExceptionType ),
+
+  /** it allows to cast a complete message structure to a give type.
+      It is useful when a structured message with all the fields set to string is received.
+      In this case it is possible to cast each single filed to different native types: int, double, boolean, etc.
+   */
 	messageTypeCast( MessageTypeCastRequest )( MessageTypeCastResponse )
 	    throws  TypeMismatch
 }
