@@ -40,7 +40,7 @@ outputPort JesterUtils {
 }
 
 constants {
-  LOG = false
+  LOG = true
 }
 
 
@@ -125,21 +125,26 @@ define __body {
                         
                         // proceed only if a rest template has been defined for that operation
                         if ( is_defined( request.template.( oper.operation_name ) ) ) {
-                            __given_template = request.template.( oper.operation_name )
+                            __given_template = request.template.( oper.operation_name ).template
                         } else {
                             __given_template = ""
                         }
                        
                          if ( !easyInterface && !(__given_template instanceof void) ) {
-                            analyzeTemplate@JesterUtils(__given_template )( analyzed_template )
-                            __template = analyzed_template.template
-                            __method = analyzed_template.method
+                           // analyzeTemplate@JesterUtils(__given_template )( analyzed_template )
+                            __template = request.template.( oper.operation_name ).template
+                            __method = request.template.( oper.operation_name ).method
+                            if ( request.template.( oper.operation_name ).exceptions){
+                                __exceptions << request.template.( oper.operation_name ).exceptions 
+                            }
                         } else {
                             __method = "post"
                         }
+
+                    
                         
                         if ( LOG ) { println@Console("Operation Template:" + __template )() }
-
+                        if ( LOG ) { println@Console("Operation Method:" + __method )() }
                         
                         if ( is_defined( oper.output ) ) {
                             rr_operation_max = #render.output_port[ output_port_index ].interfaces[ int_i ].rr_operation
@@ -213,6 +218,10 @@ define __body {
                             if ( LOG ) { println@Console( "Template automatically generated:" + __template )() }
                         }
                         current_render_operation.template = __template
+                        if (is_defined (__exceptions)){
+                            current_render_operation.exceptions << __exceptions
+                        }
+
                     }
               }
           }
@@ -223,6 +232,9 @@ define __config_operation {
     with( response.routes[ __r_counter ] ) {
         .method = __cur_op.method;
         .template = __cur_op.template;
+        if (is_defined (__cur_op.exception) ){
+          .exceptions =  __cur_op.exceptions
+        }
         .operation = __cur_op;
         .outputPort = service_input_port;
         foreach( cast_par : __cast ) {

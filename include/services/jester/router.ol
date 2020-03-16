@@ -177,6 +177,9 @@ define findRoute
 			matchTemplate;
 			op = routes[i].operation;
 			outputPort = routes[i].outputPort;
+			if (is_defined( routes[i].exceptions)){
+				exceptions << routes[i].exceptions
+			}
 			undef( cast );
 			cast << routes[i].cast
 		}
@@ -210,6 +213,15 @@ define headerHandlerResponse{
 		   responseOutgoingHeaders.(n) = invokeReponseHeader.(n)
 			
 	}
+}
+
+define findError{
+	if (is_defined(exceptions.(__exceptionName))){
+	  statusCode = exceptions.(__exceptionName)
+	}else{
+      statusCode = 500
+	}
+	
 }
 
 define route
@@ -279,7 +291,8 @@ define route
 
 		scope( invoke_scope ) {
 			install( InvocationFault => 
-					statusCode = 500
+					__exceptionName = invoke_scope.InvocationFault.name
+					findError
 					undef( response )
 					response.fault = invoke_scope.InvocationFault.name
 					if ( invoke_scope.InvocationFault.name == "TypeMismatch" ) {

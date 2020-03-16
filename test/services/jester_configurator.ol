@@ -20,7 +20,7 @@ define doTest {
     wkdir = "./services/private"
     easy_interface = false
 
-    template_json = "{ \"getUsers\":\"method=post, template=/users/{country}\", \"getOrders\":\"method=get, template=/orders/{userId}?maxItems={maxItems}\",\n\"getOrdersByItem\":\"method=post\",\n\"putOrder\":\"method=put\",\n\"deleteOrder\":\"method=delete\"}"
+    template_json = "{ \"getUsers\":{\"method\":\"post\", \"template\":\"/users/{country}\"}, \"getOrders\":{\"method\":\"get\", \"template\":\"/orders/{userId}?maxItems={maxItems}\"},\n\"getOrdersByItem\":{\"method\":\"post\" , \"exceptions\":{\"FaultTest\" : 501 , \"FaultTest2\" : 503 }},\"putOrder\":{\"method\":\"put\"},\n\"deleteOrder\":{\"method\":\"delete\"}}"
     getJsonValue@JsonUtils( template_json )( template )
     
     with( jester ) {

@@ -29,6 +29,7 @@ type GetJesterConfigRequest: void {
   .inputPort: string
   .easyInterface?: bool
   .template?: undefined
+  .exceptions?: undefined
 }
 
 interface JesterConfiguratorInterface {
