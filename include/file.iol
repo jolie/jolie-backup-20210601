@@ -145,7 +145,7 @@ RequestResponse:
 	 *  Use "@Prefix" for forcing a prefix in an element.
 	 *  Use "@ForceAttribute" for forcing an attribute in an element even if it is not defined in the corresponding schema
 	 */
-	writeFile(WriteFileRequest)(void) throws FileNotFound(FileNotFoundType) IOException(IOExceptionType),
+	writeFile(WriteFileRequest)(void) throws IOException(IOExceptionType),
 
 	/**!
 	  it copies a source directory into a destination one

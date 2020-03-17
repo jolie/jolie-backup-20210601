@@ -57,13 +57,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import jolie.lang.Constants;
-import jolie.lang.parse.OLParseTreeOptimizer;
-import jolie.lang.parse.OLParser;
-import jolie.lang.parse.ParserException;
-import jolie.lang.parse.Scanner;
-import jolie.lang.parse.SemanticException;
-import jolie.lang.parse.SemanticVerifier;
-import jolie.lang.parse.TypeChecker;
+import jolie.lang.parse.*;
 import jolie.lang.parse.ast.Program;
 import jolie.monitoring.MonitoringEvent;
 import jolie.monitoring.events.MonitorAttachedEvent;
@@ -1272,6 +1266,8 @@ public class Interpreter
 				SemanticVerifier.Configuration conf = new SemanticVerifier.Configuration();
 				conf.setCheckForMain( false );
 				semanticVerifier = new SemanticVerifier( program, conf );
+				QualityVerifier qualityVerifier = new QualityVerifier( program );
+				qualityVerifier.validate();
 			} else {
 				semanticVerifier = new SemanticVerifier( program );
 			}
