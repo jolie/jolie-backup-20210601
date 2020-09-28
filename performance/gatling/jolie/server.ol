@@ -1,10 +1,8 @@
-include "file.iol"
-
 
 
 interface BasicHttpInterface {
     RequestResponse: 
-     put(undefined)(undefined),
+     post(undefined)(undefined),
      get(undefined)(undefined),
 
 }
@@ -17,7 +15,7 @@ inputPort TestPort {
        Location:  "socket://localhost:80"
        Protocol: http {
            .default.get = "get";
-           .default.put = "put" 
+           .default.post = "post" 
        }
        Interfaces: BasicHttpInterface
     }
@@ -28,19 +26,15 @@ init
   } 
  main {
  
-    [put(request)(reponse){
+    [post(request)(response){
 
         synchronized( syncToken ) { 
-            writeFileRequest.filename =  ++global.numberFile + ".jpg"
-            writeFileRequest.format = "binary"
-            writeFile@File(writeFileRequest)(writeFileResponse)
+            global.document[++global.numberDocuments] << request
         }
     }]
     
-    [get(request)(reponse){
-                readFileRequest.filename =   "1.jpg"
-                readFileRequest.format = "binary"
-                writeFile@File(writeFileRequest)(writeFileResponse)
+    [get(request)(response){
+       response << global.document[1]
     }]
  }
  
